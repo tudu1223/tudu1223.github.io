@@ -60,15 +60,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title></title>
-    <url>/2024/10/12/%E6%B5%8B%E8%AF%95/</url>
-    <content><![CDATA[<span id="more"></span>
-
-<p>title: 测试<br>date: 2024-10-12 23:32:22<br>tags:text</p>
-<p>仅为测试使用</p>
-]]></content>
-  </entry>
-  <entry>
     <title>编程作业2</title>
     <url>/2024/11/04/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A2/</url>
     <content><![CDATA[<h2 id="1、【程序文件名】zy-1-cpp"><a href="#1、【程序文件名】zy-1-cpp" class="headerlink" title="1、【程序文件名】zy-1.cpp"></a>1、【程序文件名】zy-1.cpp</h2><p>【题目描述】编写一个程序，功能是：输入两个整数，变量值交换后输出，输出时两个整数间用一个空格隔开。如输入：12 34，则输出：34 12</p>
@@ -123,6 +114,15 @@
 <h2 id="3、【程序文件名】zy3-3-cpp"><a href="#3、【程序文件名】zy3-3-cpp" class="headerlink" title="3、【程序文件名】zy3-3.cpp"></a>3、【程序文件名】zy3-3.cpp</h2><p>【题目描述】编程一程序，功能是：求1!+2!+3!+…+n!的值。其中，n由键盘输入。例如：输入：3，输出：9；输入：5，输出：153；输入：8，输出：46233。</p>
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> n;</span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> sum = <span class="number">0</span>;</span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> f = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;n);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">        f*= i;</span><br><span class="line">        sum += f;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%lld&quot;</span>, sum);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2024/10/12/%E6%B5%8B%E8%AF%95/</url>
+    <content><![CDATA[<span id="more"></span>
+
+<p>title: 测试<br>date: 2024-10-12 23:32:22<br>tags:text</p>
+<p>仅为测试使用</p>
 ]]></content>
   </entry>
   <entry>
