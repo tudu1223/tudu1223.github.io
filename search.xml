@@ -1,111 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<search> 
-  
-  
-    
-    <entry>
-      <title>编程作业汇总</title>
-      <link href="/2024/11/05/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A%E6%B1%87%E6%80%BB/"/>
-      <url>/2024/11/05/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A%E6%B1%87%E6%80%BB/</url>
-      
-        <content type="html"><![CDATA[<p>24.11.5后均在此更新，ctrl+f可以直接搜索</p><span id="more"></span><h1 id="编程作业4（24-11-5）"><a href="#编程作业4（24-11-5）" class="headerlink" title="编程作业4（24.11.5）"></a>编程作业4（24.11.5）</h1><h2 id="1、【程序文件名】zy3-1-cpp"><a href="#1、【程序文件名】zy3-1-cpp" class="headerlink" title="1、【程序文件名】zy3-1.cpp"></a>1、【程序文件名】zy3-1.cpp</h2><p>【题目描述】编写一程序，功能是：从键盘输入一个小于1000的正数，输出它的自然对数（小数保留2位）。要求在输入数据后先对其进行检查是否为小于1000的正数。若不是，则重新输入，直到输入符合要求为止。例如：输入：99，输出：4.60；输入：555，输出：6.32；输入：999，输出：6.91。注：math.h头文件中的自然对数函数log。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;math.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    double num;</span><br><span class="line">    do &#123;</span><br><span class="line">        scanf(&quot;%lf&quot;, &amp;num);</span><br><span class="line">        if (num &lt;= 0 || num &gt;= 1000) &#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; while (num &lt;= 0 || num &gt;= 1000);</span><br><span class="line">    printf(&quot;%.2f\n&quot;, log(num));</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="2、【程序文件名】zy3-2-cpp"><a href="#2、【程序文件名】zy3-2-cpp" class="headerlink" title="2、【程序文件名】zy3-2.cpp"></a>2、【程序文件名】zy3-2.cpp</h2><p>【题目描述】编程一程序，功能是：求1到n之间能同时被3和7整除的整数之和。其中，n由键盘输入。例如：输入：100，输出：210；输入：500，输出：5796；输入：1000，输出：23688。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int n, sum = 0;</span><br><span class="line">    scanf(&quot;%d&quot;, &amp;n);</span><br><span class="line">    for (int i = 21; i &lt;= n; i += 21) &#123;</span><br><span class="line">        sum += i;</span><br><span class="line">    &#125;</span><br><span class="line">    printf(&quot;%d&quot;, sum);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="3、【程序文件名】zy3-3-cpp"><a href="#3、【程序文件名】zy3-3-cpp" class="headerlink" title="3、【程序文件名】zy3-3.cpp"></a>3、【程序文件名】zy3-3.cpp</h2><p>【题目描述】编程一程序，功能是：求1!+2!+3!+…+n!的值。其中，n由键盘输入。例如：输入：3，输出：9；输入：5，输出：153；输入：8，输出：46233。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int n;</span><br><span class="line">    long long sum = 0;</span><br><span class="line">    long long f = 1;</span><br><span class="line"></span><br><span class="line">    scanf(&quot;%d&quot;, &amp;n);</span><br><span class="line">    for (int i = 1; i &lt;= n; i++) &#123;</span><br><span class="line">        f*= i;</span><br><span class="line">        sum += f;</span><br><span class="line">    &#125;</span><br><span class="line">    printf(&quot;%lld&quot;, sum);</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>编程作业1</title>
-      <link href="/2024/11/04/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A1/"/>
-      <url>/2024/11/04/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A1/</url>
-      
-        <content type="html"><![CDATA[<h2 id="1、【程序文件名】zy1-1-cpp"><a href="#1、【程序文件名】zy1-1-cpp" class="headerlink" title="1、【程序文件名】zy1-1.cpp"></a>1、【程序文件名】zy1-1.cpp</h2><p>【题目描述】编写一个程序，功能是：输入一个3位的正整数，逆序输出。如输入：345，则输出：543，输入：530，则输出：035。</p><span id="more"></span><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    char a，b，c;</span><br><span class="line">    scanf(&quot;%c%c%c&quot;, &amp;a，&amp;b，&amp;c）;</span><br><span class="line">    printf(&quot;%c%c%c&quot;, a, b, c);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="2、【程序文件名】zy1-2-cpp"><a href="#2、【程序文件名】zy1-2-cpp" class="headerlink" title="2、【程序文件名】zy1-2.cpp"></a>2、【程序文件名】zy1-2.cpp</h2><p>【题目描述】编写一个程序，功能是：输入一个字母，若是大写字母直接输出，若输入小写字母输出它对应的大写字母。如输入：B，则输出：B，输入：d，则输出：D。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    char letter;</span><br><span class="line">    scanf(&quot;%c&quot;, &amp;letter);</span><br><span class="line">    char result = (letter &gt;= &#x27;a&#x27; &amp;&amp; letter &lt;= &#x27;z&#x27;) ? (letter - &#x27;a&#x27; + &#x27;A&#x27;) : letter;</span><br><span class="line">    printf(&quot;%c&quot;, result);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="3、【程序文件名】zy1-3-cpp"><a href="#3、【程序文件名】zy1-3-cpp" class="headerlink" title="3、【程序文件名】zy1-3.cpp"></a>3、【程序文件名】zy1-3.cpp</h2><p>【题目描述】编写一个程序，功能是：输入一个正整数（占4个字节），输出右边第2字节的值。如输入：255，则输出：0；输入：256，输出：1；输入：16666，输出：65。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    unsigned int num;</span><br><span class="line">    scanf(&quot;%u&quot;, &amp;num);</span><br><span class="line">    unsigned char second_byte = (num &gt;&gt; 8) &amp; 0xFF;</span><br><span class="line">    printf(&quot;%u&quot;, second_byte);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>编程作业3</title>
-      <link href="/2024/11/04/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A3/"/>
-      <url>/2024/11/04/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A3/</url>
-      
-        <content type="html"><![CDATA[<h2 id="1、【程序文件名】zy2-1-cpp"><a href="#1、【程序文件名】zy2-1-cpp" class="headerlink" title="1、【程序文件名】zy2-1.cpp"></a>1、【程序文件名】zy2-1.cpp</h2><p>【题目描述】编写一程序，功能是：输入一个百分制成绩（正整数），输出成绩等级A、B、C、D、E。其中90分以上为A、80<del>89为B、70</del>79为C、60~69为D、小于60分为E。用if语句实现。例如：输入：90，输出：A；输入68，输出：D；输出15，输出：E。</p><span id="more"></span><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int score;</span><br><span class="line">    scanf(&quot;%d&quot;, &amp;score);</span><br><span class="line">    if (score &gt;= 90 &amp;&amp; score &lt;= 100) &#123;</span><br><span class="line">        printf(&quot;A&quot;);</span><br><span class="line">    &#125; else if (score &gt;= 80) &#123;</span><br><span class="line">        printf(&quot;B&quot;);</span><br><span class="line">    &#125; else if (score &gt;= 70) &#123;</span><br><span class="line">        printf(&quot;C&quot;);</span><br><span class="line">    &#125; else if (score &gt;= 60) &#123;</span><br><span class="line">        printf(&quot;D&quot;);</span><br><span class="line">    &#125; else if (score &gt;= 0) &#123;</span><br><span class="line">        printf(&quot;E&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125; </span><br><span class="line"></span><br></pre></td></tr></table></figure><h2 id="2、【程序文件名】zy2-2-cpp"><a href="#2、【程序文件名】zy2-2-cpp" class="headerlink" title="2、【程序文件名】zy2-2.cpp"></a>2、【程序文件名】zy2-2.cpp</h2><p>【题目描述】编写一程序，功能是：输入一个百分制成绩（正整数），输出成绩等级A、B、C、D、E。其中90分以上为A、80<del>89为B、70</del>79为C、60~69为D、小于60分为E。用switch语句实现。例如：输入：90，输出：A；输入68，输出：D；输出15，输出：E。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int score;</span><br><span class="line">    scanf(&quot;%d&quot;, &amp;score);</span><br><span class="line">    char grade;</span><br><span class="line"></span><br><span class="line">    switch (score / 10) &#123;</span><br><span class="line">        case 10:</span><br><span class="line">        case 9:</span><br><span class="line">            grade = &#x27;A&#x27;;</span><br><span class="line">            break;</span><br><span class="line">        case 8:</span><br><span class="line">            grade = &#x27;B&#x27;;</span><br><span class="line">            break;</span><br><span class="line">        case 7:</span><br><span class="line">            grade = &#x27;C&#x27;;</span><br><span class="line">            break;</span><br><span class="line">        case 6:</span><br><span class="line">            grade = &#x27;D&#x27;;</span><br><span class="line">            break;</span><br><span class="line">        case 5:</span><br><span class="line">        case 4:</span><br><span class="line">        case 3:</span><br><span class="line">        case 2:</span><br><span class="line">        case 1:</span><br><span class="line">        case 0:</span><br><span class="line">            grade = &#x27;E&#x27;;</span><br><span class="line">            break;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    printf(&quot;%c&quot;, grade);</span><br><span class="line">    </span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="3、【程序文件名】zy2-3-cpp"><a href="#3、【程序文件名】zy2-3-cpp" class="headerlink" title="3、【程序文件名】zy2-3.cpp"></a>3、【程序文件名】zy2-3.cpp</h2><p>【题目描述】编写一程序，功能是：输入4个整数，要求按从小到大的顺序输出这4个数。（输出数据以1个空格隔开）。注：不能使用数组。例如：输入：3 1 6 4，输出：1 3 4 6；输入：67 100 31 67，输出：31 67 67 100。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int a, b, c, d;</span><br><span class="line">    scanf(&quot;%d %d %d %d&quot;, &amp;a, &amp;b, &amp;c, &amp;d);</span><br><span class="line">    if (a &gt; b) &#123; </span><br><span class="line">int temp = a; a = b; b = temp; </span><br><span class="line">&#125;</span><br><span class="line">    if (a &gt; c) &#123; </span><br><span class="line">int temp = a; a = c; c = temp; </span><br><span class="line">&#125;</span><br><span class="line">    if (a &gt; d) &#123; </span><br><span class="line">int temp = a; a = d; d = temp; </span><br><span class="line">&#125;</span><br><span class="line">    if (b &gt; c) &#123; </span><br><span class="line">int temp = b; b = c; c = temp; </span><br><span class="line">&#125;</span><br><span class="line">    if (b &gt; d) &#123;</span><br><span class="line"> int temp = b; b = d; d = temp; </span><br><span class="line"> &#125;</span><br><span class="line">    if (c &gt; d) &#123; </span><br><span class="line">int temp = c; c = d; d = temp; </span><br><span class="line">&#125;</span><br><span class="line">    printf(&quot;%d %d %d %d&quot;, a, b, c, d);</span><br><span class="line">    return 0;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure><h2 id="4、【程序文件名】zy2-4-cpp"><a href="#4、【程序文件名】zy2-4-cpp" class="headerlink" title="4、【程序文件名】zy2-4.cpp"></a>4、【程序文件名】zy2-4.cpp</h2><p>【题目描述】编写一程序，功能是：求1~n中所有偶数之和，其中，n由键盘输入。例如：输入：10，输出：30；输入：50，输出：650；输入：100，输出：2550。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int n;</span><br><span class="line">    int sum = 0;</span><br><span class="line">    scanf(&quot;%d&quot;, &amp;n);</span><br><span class="line"></span><br><span class="line">    for (int i = 2; i &lt;= n; i += 2) &#123;</span><br><span class="line">        sum += i;</span><br><span class="line">    &#125;</span><br><span class="line">    printf(&quot;%d&quot;, sum);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>编程作业2</title>
-      <link href="/2024/11/04/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A2/"/>
-      <url>/2024/11/04/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A2/</url>
-      
-        <content type="html"><![CDATA[<h2 id="1、【程序文件名】zy-1-cpp"><a href="#1、【程序文件名】zy-1-cpp" class="headerlink" title="1、【程序文件名】zy-1.cpp"></a>1、【程序文件名】zy-1.cpp</h2><p>【题目描述】编写一个程序，功能是：输入两个整数，变量值交换后输出，输出时两个整数间用一个空格隔开。如输入：12 34，则输出：34 12</p><span id="more"></span><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int num1, num2, temp;</span><br><span class="line">    scanf(&quot;%d %d&quot;, &amp;num1, &amp;num2);</span><br><span class="line">    temp = num1; </span><br><span class="line">    num1 = num2; </span><br><span class="line">    num2 = temp; </span><br><span class="line">    printf(&quot;%d %d&quot;, num1, num2);</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="2、【程序文件名】zy-2-cpp"><a href="#2、【程序文件名】zy-2-cpp" class="headerlink" title="2、【程序文件名】zy-2.cpp"></a>2、【程序文件名】zy-2.cpp</h2><p>【题目描述】编写一个程序，功能是：求<br>$$<br>√(|x^3-5| )&#x2F;(e^x+3)。<br>$$<br>。其中，x为浮点数，由键盘输入。计算后输出y的值（显示两位小数)。如输入：3.5，则输出：0.17，输入：-1.2，则输出：0.79。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;math.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    float x, y;</span><br><span class="line">    scanf(&quot;%f&quot;, &amp;x);</span><br><span class="line">    y = sqrt(fabs(pow(x, 3) - 5)) / (exp(x) + 3);</span><br><span class="line">    printf(&quot;%.2f&quot;, y);</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="3、【程序文件名】zy-3-cpp"><a href="#3、【程序文件名】zy-3-cpp" class="headerlink" title="3、【程序文件名】zy-3.cpp"></a>3、【程序文件名】zy-3.cpp</h3><p>【题目描述】编写一个程序，功能是：输入一个年份，判断它是否为闰年。其中，闰年的年份满足以下两个条件之一：一是能被400整除；二是能被4整除，但不能被100整除。如输入：2024，则输出：Y；输入：2022，输出：N。</p><p>  要求：使用条件运算符，不使用if语句。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int year;</span><br><span class="line">    scanf(&quot;%d&quot;, &amp;year);</span><br><span class="line">    char isLeapYear = (year % 400 == 0 || (year % 4 == 0 &amp;&amp; year % 100 != 0)) ? &#x27;Y&#x27; : &#x27;N&#x27;;</span><br><span class="line">    printf(&quot;%c\n&quot;, isLeapYear);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>博客搭建</title>
-      <link href="/2024/10/12/%E6%96%87%E7%AB%A0/"/>
-      <url>/2024/10/12/%E6%96%87%E7%AB%A0/</url>
-      
-        <content type="html"><![CDATA[<h1 id="搭建心路"><a href="#搭建心路" class="headerlink" title="搭建心路"></a>搭建心路</h1><span id="more"></span><h2 id="一、准备工具-环境"><a href="#一、准备工具-环境" class="headerlink" title="一、准备工具&#x2F;环境"></a>一、准备工具&#x2F;环境</h2><p>  一个趁手的魔法上网工具（GitHub真的好慢），node.js，hexo，typora，git（这玩意官网下也好慢）</p><h2 id="二、博客的搭建"><a href="#二、博客的搭建" class="headerlink" title="二、博客的搭建"></a>二、博客的搭建</h2><p>  工欲善其事，必先利其器。为了流畅且丝滑的搭建博客，我浏览了一些B站视频，并从中选取了最短的一个来作为学习模板（懒狗一条了属于是）。在搭建过程中仅有一次报错，为“error deployer not found: git“，在 csdn上了解到，这是由于没有安装hexo-deployer-git插件，根据网址的教学运行npm install hexo-deployer-git –save便成功解决</p><p>  搭建过程中并没有截什么图，便自然只有文字了</p><h2 id="三、搭建过程"><a href="#三、搭建过程" class="headerlink" title="三、搭建过程"></a>三、搭建过程</h2><p>  1.安装所需软件并配置环境</p><p>  2.去GitHub白嫖免费服务器并搞定ssh链接</p><p> 3.更改一些_config.yaml下的配置</p><p> 4.改个主题并部署网页</p><h2 id="四、参考的视频以及文章"><a href="#四、参考的视频以及文章" class="headerlink" title="四、参考的视频以及文章"></a>四、参考的视频以及文章</h2><p>参考的视频以及文章</p><p>  感谢各位前辈留下的宝贵资料</p><p><a href="https://blog.csdn.net/qq_41688840/article/details/125826614">部署hexo遇到报错ERROR Deployer not found: git的解决办法-CSDN博客</a></p><p>[<a href="https://www.bilibili.com/video/BV1Eg41157tL/?spm_id_from=333.337.search-card.all.click&vd_source=0a239ca12066e72b92ef0094a8ca6ef0">教程]Hexo &amp; Github搭建自己的专属博客_哔哩哔哩_bilibili</a></p><h2 id="五、在搭建博客中有感"><a href="#五、在搭建博客中有感" class="headerlink" title="五、在搭建博客中有感"></a>五、在搭建博客中有感</h2><p>  博客的搭建需要一些耐心和善用搜索引擎，大部分问题前人都给了详尽的回答，我们只需要站在巨人的肩膀上，到虽然我没有遇到多少报错，但是从帮助舍友搭建博客时来看，几乎现阶段能遇到的所有报错都可以在网上找到解决方式，甚至有的报错只需要翻译一下就能看懂错在哪里。</p>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>虚拟机</title>
-      <link href="/2024/10/12/%E9%A6%96%E9%A1%B5/"/>
-      <url>/2024/10/12/%E9%A6%96%E9%A1%B5/</url>
-      
-        <content type="html"><![CDATA[<h1 id="虚拟机的搭建"><a href="#虚拟机的搭建" class="headerlink" title="虚拟机的搭建"></a>虚拟机的搭建</h1><span id="more"></span><h2 id="一、准备软件-安装包"><a href="#一、准备软件-安装包" class="headerlink" title="一、准备软件\安装包"></a>一、准备软件\安装包</h2><p> VMware，ubuntu，kali，ctfos（B站看到了就随手搞了）</p><h2 id="二、搭建过程"><a href="#二、搭建过程" class="headerlink" title="二、搭建过程"></a>二、搭建过程</h2><p> 1.下载对应软件及系统iso文件</p><p> 2.新建虚拟机，按照引导进行配置，分盘，安装</p><p> 3.拍摄快照，便于以后可以遇到问题不用重装系统（省内存哈哈哈）</p><h4 id="ctfos"><a href="#ctfos" class="headerlink" title="ctfos"></a>ctfos</h4><p>ctfos的安装小有不同，只需要直接打开.ovf文件即可</p><h2 id="三、搭建结果"><a href="#三、搭建结果" class="headerlink" title="三、搭建结果"></a>三、搭建结果</h2><p><img src="https://p.sda1.dev/19/109c3dac1c57f5c749dd011c95c8f8b1/kali.png"></p><p><img src="https://p.sda1.dev/19/9ac69690bc530b9566822a120b9d490c/ctfos.png"></p><p><img src="https://p.sda1.dev/19/3b52bc0bd23513b9e5d3fbb14371c70e/ub.png"></p>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/2024/10/12/%E6%B5%8B%E8%AF%95/"/>
-      <url>/2024/10/12/%E6%B5%8B%E8%AF%95/</url>
-      
-        <content type="html"><![CDATA[<span id="more"></span><p>title: 测试<br>date: 2024-10-12 23:32:22<br>tags:text</p><p>仅为测试使用</p>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>Hello World</title>
-      <link href="/2024/09/08/hello-world/"/>
-      <url>/2024/09/08/hello-world/</url>
-      
-        <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><span id="more"></span><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-  
-  
+<search>
+  <entry>
+    <title>Hello World</title>
+    <url>/2024/09/08/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<span id="more"></span>
+
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>博客搭建</title>
+    <url>/2024/10/12/%E6%96%87%E7%AB%A0/</url>
+    <content><![CDATA[<h1 id="搭建心路"><a href="#搭建心路" class="headerlink" title="搭建心路"></a>搭建心路</h1><span id="more"></span>
+
+<h2 id="一、准备工具-环境"><a href="#一、准备工具-环境" class="headerlink" title="一、准备工具&#x2F;环境"></a>一、准备工具&#x2F;环境</h2><p>  一个趁手的魔法上网工具（GitHub真的好慢），node.js，hexo，typora，git（这玩意官网下也好慢）</p>
+<h2 id="二、博客的搭建"><a href="#二、博客的搭建" class="headerlink" title="二、博客的搭建"></a>二、博客的搭建</h2><p>  工欲善其事，必先利其器。为了流畅且丝滑的搭建博客，我浏览了一些B站视频，并从中选取了最短的一个来作为学习模板（懒狗一条了属于是）。在搭建过程中仅有一次报错，为“error deployer not found: git“，在 csdn上了解到，这是由于没有安装hexo-deployer-git插件，根据网址的教学运行npm install hexo-deployer-git –save便成功解决</p>
+<p>  搭建过程中并没有截什么图，便自然只有文字了</p>
+<h2 id="三、搭建过程"><a href="#三、搭建过程" class="headerlink" title="三、搭建过程"></a>三、搭建过程</h2><p>  1.安装所需软件并配置环境</p>
+<p>  2.去GitHub白嫖免费服务器并搞定ssh链接</p>
+<p> 3.更改一些_config.yaml下的配置</p>
+<p> 4.改个主题并部署网页</p>
+<h2 id="四、参考的视频以及文章"><a href="#四、参考的视频以及文章" class="headerlink" title="四、参考的视频以及文章"></a>四、参考的视频以及文章</h2><p>参考的视频以及文章</p>
+<p>  感谢各位前辈留下的宝贵资料</p>
+<p><a href="https://blog.csdn.net/qq_41688840/article/details/125826614">部署hexo遇到报错ERROR Deployer not found: git的解决办法-CSDN博客</a></p>
+<p>[<a href="https://www.bilibili.com/video/BV1Eg41157tL/?spm_id_from=333.337.search-card.all.click&vd_source=0a239ca12066e72b92ef0094a8ca6ef0">教程]Hexo &amp; Github搭建自己的专属博客_哔哩哔哩_bilibili</a></p>
+<h2 id="五、在搭建博客中有感"><a href="#五、在搭建博客中有感" class="headerlink" title="五、在搭建博客中有感"></a>五、在搭建博客中有感</h2><p>  博客的搭建需要一些耐心和善用搜索引擎，大部分问题前人都给了详尽的回答，我们只需要站在巨人的肩膀上，到虽然我没有遇到多少报错，但是从帮助舍友搭建博客时来看，几乎现阶段能遇到的所有报错都可以在网上找到解决方式，甚至有的报错只需要翻译一下就能看懂错在哪里。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2024/10/12/%E6%B5%8B%E8%AF%95/</url>
+    <content><![CDATA[<span id="more"></span>
+
+<p>title: 测试<br>date: 2024-10-12 23:32:22<br>tags:text</p>
+<p>仅为测试使用</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>编程作业1</title>
+    <url>/2024/11/04/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A1/</url>
+    <content><![CDATA[<h2 id="1、【程序文件名】zy1-1-cpp"><a href="#1、【程序文件名】zy1-1-cpp" class="headerlink" title="1、【程序文件名】zy1-1.cpp"></a>1、【程序文件名】zy1-1.cpp</h2><p>【题目描述】编写一个程序，功能是：输入一个3位的正整数，逆序输出。如输入：345，则输出：543，输入：530，则输出：035。</p>
+<span id="more"></span>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    char a，b，c;</span><br><span class="line">    scanf(&quot;%c%c%c&quot;, &amp;a，&amp;b，&amp;c）;</span><br><span class="line">    printf(&quot;%c%c%c&quot;, a, b, c);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="2、【程序文件名】zy1-2-cpp"><a href="#2、【程序文件名】zy1-2-cpp" class="headerlink" title="2、【程序文件名】zy1-2.cpp"></a>2、【程序文件名】zy1-2.cpp</h2><p>【题目描述】编写一个程序，功能是：输入一个字母，若是大写字母直接输出，若输入小写字母输出它对应的大写字母。如输入：B，则输出：B，输入：d，则输出：D。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    char letter;</span><br><span class="line">    scanf(&quot;%c&quot;, &amp;letter);</span><br><span class="line">    char result = (letter &gt;= &#x27;a&#x27; &amp;&amp; letter &lt;= &#x27;z&#x27;) ? (letter - &#x27;a&#x27; + &#x27;A&#x27;) : letter;</span><br><span class="line">    printf(&quot;%c&quot;, result);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="3、【程序文件名】zy1-3-cpp"><a href="#3、【程序文件名】zy1-3-cpp" class="headerlink" title="3、【程序文件名】zy1-3.cpp"></a>3、【程序文件名】zy1-3.cpp</h2><p>【题目描述】编写一个程序，功能是：输入一个正整数（占4个字节），输出右边第2字节的值。如输入：255，则输出：0；输入：256，输出：1；输入：16666，输出：65。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    unsigned int num;</span><br><span class="line">    scanf(&quot;%u&quot;, &amp;num);</span><br><span class="line">    unsigned char second_byte = (num &gt;&gt; 8) &amp; 0xFF;</span><br><span class="line">    printf(&quot;%u&quot;, second_byte);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+  </entry>
+  <entry>
+    <title>编程作业2</title>
+    <url>/2024/11/04/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A2/</url>
+    <content><![CDATA[<h2 id="1、【程序文件名】zy-1-cpp"><a href="#1、【程序文件名】zy-1-cpp" class="headerlink" title="1、【程序文件名】zy-1.cpp"></a>1、【程序文件名】zy-1.cpp</h2><p>【题目描述】编写一个程序，功能是：输入两个整数，变量值交换后输出，输出时两个整数间用一个空格隔开。如输入：12 34，则输出：34 12</p>
+<span id="more"></span>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int num1, num2, temp;</span><br><span class="line">    scanf(&quot;%d %d&quot;, &amp;num1, &amp;num2);</span><br><span class="line">    temp = num1; </span><br><span class="line">    num1 = num2; </span><br><span class="line">    num2 = temp; </span><br><span class="line">    printf(&quot;%d %d&quot;, num1, num2);</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2、【程序文件名】zy-2-cpp"><a href="#2、【程序文件名】zy-2-cpp" class="headerlink" title="2、【程序文件名】zy-2.cpp"></a>2、【程序文件名】zy-2.cpp</h2><p>【题目描述】编写一个程序，功能是：求<br>$$<br>√(|x^3-5| )&#x2F;(e^x+3)。<br>$$<br>。其中，x为浮点数，由键盘输入。计算后输出y的值（显示两位小数)。如输入：3.5，则输出：0.17，输入：-1.2，则输出：0.79。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;math.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    float x, y;</span><br><span class="line">    scanf(&quot;%f&quot;, &amp;x);</span><br><span class="line">    y = sqrt(fabs(pow(x, 3) - 5)) / (exp(x) + 3);</span><br><span class="line">    printf(&quot;%.2f&quot;, y);</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、【程序文件名】zy-3-cpp"><a href="#3、【程序文件名】zy-3-cpp" class="headerlink" title="3、【程序文件名】zy-3.cpp"></a>3、【程序文件名】zy-3.cpp</h3><p>【题目描述】编写一个程序，功能是：输入一个年份，判断它是否为闰年。其中，闰年的年份满足以下两个条件之一：一是能被400整除；二是能被4整除，但不能被100整除。如输入：2024，则输出：Y；输入：2022，输出：N。</p>
+<p>  要求：使用条件运算符，不使用if语句。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int year;</span><br><span class="line">    scanf(&quot;%d&quot;, &amp;year);</span><br><span class="line">    char isLeapYear = (year % 400 == 0 || (year % 4 == 0 &amp;&amp; year % 100 != 0)) ? &#x27;Y&#x27; : &#x27;N&#x27;;</span><br><span class="line">    printf(&quot;%c\n&quot;, isLeapYear);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+  </entry>
+  <entry>
+    <title>编程作业3</title>
+    <url>/2024/11/04/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A3/</url>
+    <content><![CDATA[<h2 id="1、【程序文件名】zy2-1-cpp"><a href="#1、【程序文件名】zy2-1-cpp" class="headerlink" title="1、【程序文件名】zy2-1.cpp"></a>1、【程序文件名】zy2-1.cpp</h2><p>【题目描述】编写一程序，功能是：输入一个百分制成绩（正整数），输出成绩等级A、B、C、D、E。其中90分以上为A、80<del>89为B、70</del>79为C、60~69为D、小于60分为E。用if语句实现。例如：输入：90，输出：A；输入68，输出：D；输出15，输出：E。</p>
+<span id="more"></span>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int score;</span><br><span class="line">    scanf(&quot;%d&quot;, &amp;score);</span><br><span class="line">    if (score &gt;= 90 &amp;&amp; score &lt;= 100) &#123;</span><br><span class="line">        printf(&quot;A&quot;);</span><br><span class="line">    &#125; else if (score &gt;= 80) &#123;</span><br><span class="line">        printf(&quot;B&quot;);</span><br><span class="line">    &#125; else if (score &gt;= 70) &#123;</span><br><span class="line">        printf(&quot;C&quot;);</span><br><span class="line">    &#125; else if (score &gt;= 60) &#123;</span><br><span class="line">        printf(&quot;D&quot;);</span><br><span class="line">    &#125; else if (score &gt;= 0) &#123;</span><br><span class="line">        printf(&quot;E&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125; </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="2、【程序文件名】zy2-2-cpp"><a href="#2、【程序文件名】zy2-2-cpp" class="headerlink" title="2、【程序文件名】zy2-2.cpp"></a>2、【程序文件名】zy2-2.cpp</h2><p>【题目描述】编写一程序，功能是：输入一个百分制成绩（正整数），输出成绩等级A、B、C、D、E。其中90分以上为A、80<del>89为B、70</del>79为C、60~69为D、小于60分为E。用switch语句实现。例如：输入：90，输出：A；输入68，输出：D；输出15，输出：E。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int score;</span><br><span class="line">    scanf(&quot;%d&quot;, &amp;score);</span><br><span class="line">    char grade;</span><br><span class="line"></span><br><span class="line">    switch (score / 10) &#123;</span><br><span class="line">        case 10:</span><br><span class="line">        case 9:</span><br><span class="line">            grade = &#x27;A&#x27;;</span><br><span class="line">            break;</span><br><span class="line">        case 8:</span><br><span class="line">            grade = &#x27;B&#x27;;</span><br><span class="line">            break;</span><br><span class="line">        case 7:</span><br><span class="line">            grade = &#x27;C&#x27;;</span><br><span class="line">            break;</span><br><span class="line">        case 6:</span><br><span class="line">            grade = &#x27;D&#x27;;</span><br><span class="line">            break;</span><br><span class="line">        case 5:</span><br><span class="line">        case 4:</span><br><span class="line">        case 3:</span><br><span class="line">        case 2:</span><br><span class="line">        case 1:</span><br><span class="line">        case 0:</span><br><span class="line">            grade = &#x27;E&#x27;;</span><br><span class="line">            break;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    printf(&quot;%c&quot;, grade);</span><br><span class="line">    </span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3、【程序文件名】zy2-3-cpp"><a href="#3、【程序文件名】zy2-3-cpp" class="headerlink" title="3、【程序文件名】zy2-3.cpp"></a>3、【程序文件名】zy2-3.cpp</h2><p>【题目描述】编写一程序，功能是：输入4个整数，要求按从小到大的顺序输出这4个数。（输出数据以1个空格隔开）。注：不能使用数组。例如：输入：3 1 6 4，输出：1 3 4 6；输入：67 100 31 67，输出：31 67 67 100。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int a, b, c, d;</span><br><span class="line">    scanf(&quot;%d %d %d %d&quot;, &amp;a, &amp;b, &amp;c, &amp;d);</span><br><span class="line">    if (a &gt; b) &#123; </span><br><span class="line">	int temp = a; a = b; b = temp; </span><br><span class="line">	&#125;</span><br><span class="line">    if (a &gt; c) &#123; </span><br><span class="line">	int temp = a; a = c; c = temp; </span><br><span class="line">	&#125;</span><br><span class="line">    if (a &gt; d) &#123; </span><br><span class="line">	int temp = a; a = d; d = temp; </span><br><span class="line">	&#125;</span><br><span class="line">    if (b &gt; c) &#123; </span><br><span class="line">	int temp = b; b = c; c = temp; </span><br><span class="line">	&#125;</span><br><span class="line">    if (b &gt; d) &#123;</span><br><span class="line">	 int temp = b; b = d; d = temp; </span><br><span class="line">	 &#125;</span><br><span class="line">    if (c &gt; d) &#123; </span><br><span class="line">	int temp = c; c = d; d = temp; </span><br><span class="line">	&#125;</span><br><span class="line">    printf(&quot;%d %d %d %d&quot;, a, b, c, d);</span><br><span class="line">    return 0;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
+<h2 id="4、【程序文件名】zy2-4-cpp"><a href="#4、【程序文件名】zy2-4-cpp" class="headerlink" title="4、【程序文件名】zy2-4.cpp"></a>4、【程序文件名】zy2-4.cpp</h2><p>【题目描述】编写一程序，功能是：求1~n中所有偶数之和，其中，n由键盘输入。例如：输入：10，输出：30；输入：50，输出：650；输入：100，输出：2550。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int n;</span><br><span class="line">    int sum = 0;</span><br><span class="line">    scanf(&quot;%d&quot;, &amp;n);</span><br><span class="line"></span><br><span class="line">    for (int i = 2; i &lt;= n; i += 2) &#123;</span><br><span class="line">        sum += i;</span><br><span class="line">    &#125;</span><br><span class="line">    printf(&quot;%d&quot;, sum);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+  </entry>
+  <entry>
+    <title>编程作业汇总</title>
+    <url>/2024/11/05/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A%E6%B1%87%E6%80%BB/</url>
+    <content><![CDATA[<p>24.11.5后均在此更新，ctrl+f可以直接搜索</p>
+<span id="more"></span>
+
+<h1 id="编程作业4（24-11-5）"><a href="#编程作业4（24-11-5）" class="headerlink" title="编程作业4（24.11.5）"></a>编程作业4（24.11.5）</h1><h2 id="1、【程序文件名】zy3-1-cpp"><a href="#1、【程序文件名】zy3-1-cpp" class="headerlink" title="1、【程序文件名】zy3-1.cpp"></a>1、【程序文件名】zy3-1.cpp</h2><p>【题目描述】编写一程序，功能是：从键盘输入一个小于1000的正数，输出它的自然对数（小数保留2位）。要求在输入数据后先对其进行检查是否为小于1000的正数。若不是，则重新输入，直到输入符合要求为止。例如：输入：99，输出：4.60；输入：555，输出：6.32；输入：999，输出：6.91。注：math.h头文件中的自然对数函数log。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;math.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    double num;</span><br><span class="line">    do &#123;</span><br><span class="line">        scanf(&quot;%lf&quot;, &amp;num);</span><br><span class="line">        if (num &lt;= 0 || num &gt;= 1000) &#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; while (num &lt;= 0 || num &gt;= 1000);</span><br><span class="line">    printf(&quot;%.2f\n&quot;, log(num));</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="2、【程序文件名】zy3-2-cpp"><a href="#2、【程序文件名】zy3-2-cpp" class="headerlink" title="2、【程序文件名】zy3-2.cpp"></a>2、【程序文件名】zy3-2.cpp</h2><p>【题目描述】编程一程序，功能是：求1到n之间能同时被3和7整除的整数之和。其中，n由键盘输入。例如：输入：100，输出：210；输入：500，输出：5796；输入：1000，输出：23688。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int n, sum = 0;</span><br><span class="line">    scanf(&quot;%d&quot;, &amp;n);</span><br><span class="line">    for (int i = 21; i &lt;= n; i += 21) &#123;</span><br><span class="line">        sum += i;</span><br><span class="line">    &#125;</span><br><span class="line">    printf(&quot;%d&quot;, sum);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="3、【程序文件名】zy3-3-cpp"><a href="#3、【程序文件名】zy3-3-cpp" class="headerlink" title="3、【程序文件名】zy3-3.cpp"></a>3、【程序文件名】zy3-3.cpp</h2><p>【题目描述】编程一程序，功能是：求1!+2!+3!+…+n!的值。其中，n由键盘输入。例如：输入：3，输出：9；输入：5，输出：153；输入：8，输出：46233。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int n;</span><br><span class="line">    long long sum = 0;</span><br><span class="line">    long long f = 1;</span><br><span class="line"></span><br><span class="line">    scanf(&quot;%d&quot;, &amp;n);</span><br><span class="line">    for (int i = 1; i &lt;= n; i++) &#123;</span><br><span class="line">        f*= i;</span><br><span class="line">        sum += f;</span><br><span class="line">    &#125;</span><br><span class="line">    printf(&quot;%lld&quot;, sum);</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+  </entry>
+  <entry>
+    <title>虚拟机</title>
+    <url>/2024/10/12/%E9%A6%96%E9%A1%B5/</url>
+    <content><![CDATA[<h1 id="虚拟机的搭建"><a href="#虚拟机的搭建" class="headerlink" title="虚拟机的搭建"></a>虚拟机的搭建</h1><span id="more"></span>
+
+<h2 id="一、准备软件-安装包"><a href="#一、准备软件-安装包" class="headerlink" title="一、准备软件\安装包"></a>一、准备软件\安装包</h2><p> VMware，ubuntu，kali，ctfos（B站看到了就随手搞了）</p>
+<h2 id="二、搭建过程"><a href="#二、搭建过程" class="headerlink" title="二、搭建过程"></a>二、搭建过程</h2><p> 1.下载对应软件及系统iso文件</p>
+<p> 2.新建虚拟机，按照引导进行配置，分盘，安装</p>
+<p> 3.拍摄快照，便于以后可以遇到问题不用重装系统（省内存哈哈哈）</p>
+<h4 id="ctfos"><a href="#ctfos" class="headerlink" title="ctfos"></a>ctfos</h4><p>ctfos的安装小有不同，只需要直接打开.ovf文件即可</p>
+<h2 id="三、搭建结果"><a href="#三、搭建结果" class="headerlink" title="三、搭建结果"></a>三、搭建结果</h2><p><img src="https://p.sda1.dev/19/109c3dac1c57f5c749dd011c95c8f8b1/kali.png"></p>
+<p><img src="https://p.sda1.dev/19/9ac69690bc530b9566822a120b9d490c/ctfos.png"></p>
+<p><img src="https://p.sda1.dev/19/3b52bc0bd23513b9e5d3fbb14371c70e/ub.png"></p>
+]]></content>
+  </entry>
 </search>
