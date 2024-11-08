@@ -103,6 +103,29 @@
 <h2 id="3、【程序文件名】zy3-3-cpp"><a href="#3、【程序文件名】zy3-3-cpp" class="headerlink" title="3、【程序文件名】zy3-3.cpp"></a>3、【程序文件名】zy3-3.cpp</h2><p>【题目描述】编程一程序，功能是：求1!+2!+3!+…+n!的值。其中，n由键盘输入。例如：输入：3，输出：9；输入：5，输出：153；输入：8，输出：46233。</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int n;</span><br><span class="line">    long long sum = 0;</span><br><span class="line">    long long f = 1;</span><br><span class="line"></span><br><span class="line">    scanf(&quot;%d&quot;, &amp;n);</span><br><span class="line">    for (int i = 1; i &lt;= n; i++) &#123;</span><br><span class="line">        f*= i;</span><br><span class="line">        sum += f;</span><br><span class="line">    &#125;</span><br><span class="line">    printf(&quot;%lld&quot;, sum);</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+
+
+<h1 id="编程作业5（24-11-8）"><a href="#编程作业5（24-11-8）" class="headerlink" title="编程作业5（24.11.8）"></a>编程作业5（24.11.8）</h1><h2 id="1、【程序文件名】zy4-1-cpp"><a href="#1、【程序文件名】zy4-1-cpp" class="headerlink" title="1、【程序文件名】zy4-1.cpp"></a>1、【程序文件名】zy4-1.cpp</h2><p>【题目描述】编写一程序，功能是：输出所有的“水仙花数”，数间用一个空格隔开。所谓“水仙花数”是指一个3位数，其各位数字立方和等于该数本身，例如，153是“水仙花数”，因为153&#x3D;1^3+5^3+3^3。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int num, a, b, c;</span><br><span class="line">    for (num = 100; num &lt;= 999; num++) &#123;</span><br><span class="line">        a = num / 100;        </span><br><span class="line">        b = (num / 10) % 10;  </span><br><span class="line">        c = num % 10; </span><br><span class="line">        if (a*a*a + b*b*b + c*c*c == num) &#123;</span><br><span class="line">            printf(&quot;%d &quot;, num); </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="2、【程序文件名】zy4-2-cpp"><a href="#2、【程序文件名】zy4-2-cpp" class="headerlink" title="2、【程序文件名】zy4-2.cpp"></a>2、【程序文件名】zy4-2.cpp</h2><p>【题目描述】编程一程序，功能是：输出如下图形。其中，行数n由键盘输入。例如：</p>
+<p>输入：5</p>
+<p>输出：</p>
+<p>   A</p>
+<p>   BAB</p>
+<p>  CBABC</p>
+<p>  DCBABCD</p>
+<p>  EDCBABCDE</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int n;</span><br><span class="line">    scanf(&quot;%d&quot;, &amp;n);</span><br><span class="line">    for (int i = 0; i &lt; n; i++) &#123;</span><br><span class="line">        for (int j = 0; j &lt; n - i - 1; j++) &#123;</span><br><span class="line">            printf(&quot; &quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        for (int j = i; j &gt;= 0; j--) &#123;</span><br><span class="line">            printf(&quot;%c&quot;, &#x27;A&#x27; + j);</span><br><span class="line">        &#125;</span><br><span class="line">        for (int j = 1; j &lt;= i; j++) &#123;</span><br><span class="line">            printf(&quot;%c&quot;, &#x27;A&#x27; + j);</span><br><span class="line">        &#125;</span><br><span class="line">        printf(&quot;\n&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="3、【程序文件名】zy4-3-cpp"><a href="#3、【程序文件名】zy4-3-cpp" class="headerlink" title="3、【程序文件名】zy4-3.cpp"></a>3、【程序文件名】zy4-3.cpp</h2><p>【题目描述】编写一程序，功能是：输入n个数，输出它们的平均值（小数保留1位）。其中n由键盘输入。注：不能用数组。下列输入的第一个数为数据的个数，即n的值。</p>
+<p>例如：输入：5 1 2 3 4 5，输出：3.0，输入：3 5 5 6，输出：5.3。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">int main() &#123;</span><br><span class="line">    int n;</span><br><span class="line">    double sum = 0.0, num;</span><br><span class="line">    scanf(&quot;%d&quot;, &amp;n);</span><br><span class="line">    for (int i = 0; i &lt; n; i++) &#123;</span><br><span class="line">        scanf(&quot;%lf&quot;, &amp;num);</span><br><span class="line">        sum += num;</span><br><span class="line">    &#125;</span><br><span class="line">    printf(&quot;%.1f\n&quot;, sum / n);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 ]]></content>
   </entry>
   <entry>
