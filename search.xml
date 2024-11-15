@@ -26,8 +26,23 @@
     <content><![CDATA[<h1 id="pwn之旅（一）"><a href="#pwn之旅（一）" class="headerlink" title="pwn之旅（一）"></a>pwn之旅（一）</h1><h2 id="一、ELF文件以及前置知识"><a href="#一、ELF文件以及前置知识" class="headerlink" title="一、ELF文件以及前置知识"></a>一、ELF文件以及前置知识</h2><h3 id="1-关键名词"><a href="#1-关键名词" class="headerlink" title="1.关键名词"></a>1.关键名词</h3><p>exploit：用于攻击的脚本与方案</p>
 <p>payload：攻击载荷，是目标进程被劫持控制流的数据</p>
 <p>shellcode：调用攻击目标的shell的代码</p>
-<p>elf文件：在Linux上编译的可执行文件</p>
-<h2 id="二、二进制基础"><a href="#二、二进制基础" class="headerlink" title="二、二进制基础"></a>二、二进制基础</h2>]]></content>
+<p>elf文件：在Linux上编译的可执行文件（.out,.so,.a）</p>
+<p>动态链接库：.so</p>
+<p>静态链接库：.a</p>
+<p>磁盘中才叫ELF，内存中叫映像，ELF有两个头（header），一个节（sections），第一个头包括整个结构信息，</p>
+<h2 id="二、Linux基本操作"><a href="#二、Linux基本操作" class="headerlink" title="二、Linux基本操作"></a>二、Linux基本操作</h2><p>1.cd：进入主目录</p>
+<p>2.pwd：查看当前所在目录</p>
+<p>3.ls：看当前目录的子目录</p>
+<p>4，-a：查看子目录更详细的信息</p>
+<p>5.touch：创建文件，用空格隔开可同时创建多个</p>
+<p>6.cat：查看文件内容</p>
+<p>7.rm 文件名：删除某文件</p>
+<p>8.mkdir：创建新目录规则同touch</p>
+<p>9.cp 文件名 目录名：复制文件至</p>
+<p>10.mv：同上，移动</p>
+<p>11.在10的基础上加上&#x2F;文件名，可以进行重命名</p>
+<p>12.man查看用法，q退出</p>
+]]></content>
   </entry>
   <entry>
     <title>博客搭建</title>
@@ -223,6 +238,32 @@
 <p>13 14 15 16</p>
 <p>输出：100</p>
 <figure class="highlight stan"><table><tr><td class="code"><pre><span class="line"><span class="meta">#include &lt;<span class="string">stdio.h</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> main() &#123;</span><br><span class="line">    <span class="type">int</span> <span class="type">matrix</span>[<span class="number">4</span>][<span class="number">4</span>];</span><br><span class="line">    <span class="type">int</span> <span class="built_in">sum</span> = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">4</span>; j++) &#123;</span><br><span class="line">            scanf(<span class="string">&quot;%d&quot;</span>, &amp;<span class="type">matrix</span>[i][j]);</span><br><span class="line">            <span class="keyword">if</span> (j &lt;= i) &#123;</span><br><span class="line">                <span class="built_in">sum</span> += <span class="type">matrix</span>[i][j];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    printf(<span class="string">&quot;%d\n&quot;</span>, <span class="built_in">sum</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="编程作业6（24-11-15）"><a href="#编程作业6（24-11-15）" class="headerlink" title="编程作业6（24.11.15）"></a>编程作业6（24.11.15）</h1><h2 id="1、程序文件名】zy6-1-cpp"><a href="#1、程序文件名】zy6-1-cpp" class="headerlink" title="1、程序文件名】zy6-1.cpp"></a>1、程序文件名】zy6-1.cpp</h2><p>【题目描述】编写一程序，功能是：输入一个字符串，统计其中数字和非数字字符各有多少 个，输出的两个数字用1个空格隔开。例如：  输入：12abc34%6h*，输出：5 6  输入：123abc$，输出：3 4  </p>
+<figure class="highlight arduino"><table><tr><td class="code"><pre><span class="line"> <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">char</span> str[<span class="number">100</span>]; </span><br><span class="line">    <span class="type">int</span> dc = <span class="number">0</span>, ndc = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>, str);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; str[i] != <span class="string">&#x27;\0&#x27;</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (str[i] &gt;= <span class="string">&#x27;0&#x27;</span> &amp;&amp; str[i] &lt;= <span class="string">&#x27;9&#x27;</span>) &#123;</span><br><span class="line">            dc++; </span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            ndc++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d %d\n&quot;</span>, dc, ndc);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="2、程序文件名】zy6-2-cpp"><a href="#2、程序文件名】zy6-2-cpp" class="headerlink" title="2、程序文件名】zy6-2.cpp"></a>2、程序文件名】zy6-2.cpp</h2><p>【题目描述】编写一程序，功能是：输入一个字符串，判断其是否为回文，即对称字符串。 例如：  输入：abcba，输出：YES  输入：abcda，输出：NO  输入：12321，输出：YES  </p>
+<figure class="highlight hsp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> &lt;stdio.h&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> main() &#123;</span><br><span class="line">    char <span class="keyword">str</span>[<span class="number">100</span>]<span class="comment">;</span></span><br><span class="line">    <span class="keyword">int</span> <span class="keyword">length</span> = <span class="number">0</span>, i<span class="comment">;</span></span><br><span class="line">    scanf(<span class="string">&quot;%s&quot;</span>, <span class="keyword">str</span>)<span class="comment">;</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">str</span>[<span class="keyword">length</span>] != <span class="string">&#x27;\0&#x27;</span>) &#123;</span><br><span class="line">        <span class="keyword">length</span>++<span class="comment">;</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span><span class="comment">; i &lt; length / 2; i++) &#123;</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">str</span>[i] != <span class="keyword">str</span>[<span class="keyword">length</span> - i - <span class="number">1</span>]) &#123;</span><br><span class="line">            printf(<span class="string">&quot;NO\n&quot;</span>)<span class="comment">; </span></span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span><span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    printf(<span class="string">&quot;YES\n&quot;</span>)<span class="comment">;</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span><span class="comment">;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="3、【程序文件名】zy6-3-cpp"><a href="#3、【程序文件名】zy6-3-cpp" class="headerlink" title="3、【程序文件名】zy6-3.cpp"></a>3、【程序文件名】zy6-3.cpp</h2><p>【题目描述】编程一程序，功能是：输入一个字符串，删除其中的数字字符。例如：  输入：abc12d45e，输出：abcde  输入：123ab$cd4，输出：ab$cd </p>
+<figure class="highlight axapta"><table><tr><td class="code"><pre><span class="line"><span class="meta">#include &lt;stdio.h&gt;</span></span><br><span class="line"><span class="built_in">int</span> main() &#123;</span><br><span class="line">    <span class="built_in">char</span> <span class="built_in">str</span>[<span class="number">100</span>]; </span><br><span class="line">    <span class="built_in">int</span> i, j = <span class="number">0</span>;</span><br><span class="line">    scanf(<span class="string">&quot;%s&quot;</span>, <span class="built_in">str</span>);</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; <span class="built_in">str</span>[i] != <span class="string">&#x27;\0&#x27;</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">str</span>[i] &lt; <span class="string">&#x27;0&#x27;</span> || <span class="built_in">str</span>[i] &gt; <span class="string">&#x27;9&#x27;</span>) &#123;</span><br><span class="line">            <span class="built_in">str</span>[j++] = <span class="built_in">str</span>[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">str</span>[j] = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">    printf(<span class="string">&quot;%s\n&quot;</span>, <span class="built_in">str</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="4、【程序文件名】zy6-4-cpp"><a href="#4、【程序文件名】zy6-4-cpp" class="headerlink" title="4、【程序文件名】zy6-4.cpp"></a>4、【程序文件名】zy6-4.cpp</h2><p>【题目描述】编程一程序，功能是：输入一个n×n的矩阵（其中n由键盘输入），输出每一 行数中的最大值。输出时每个数据后加一个空格，小数保留两位。例如：  输入：  3 </p>
+<p> 4  5.3  2  </p>
+<p>7  8   9  </p>
+<p>11 10  6  输出：5.30 9.00 11.00   </p>
+<p>输入：  4  </p>
+<p>1  2  3  4</p>
+<p>  8  7  6  5  </p>
+<p>10 11.1 8  3  </p>
+<p>78 80 85.5 65  输出：4.00 8.00 11.10 85.50 </p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
 
 ]]></content>
   </entry>
