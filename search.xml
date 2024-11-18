@@ -42,6 +42,28 @@
 <p>10.mv：同上，移动</p>
 <p>11.在10的基础上加上&#x2F;文件名，可以进行重命名</p>
 <p>12.man查看用法，q退出</p>
+<p>13.chmod +r&#x2F;w&#x2F;x 文件名，修改可读可写可执行权限</p>
+<p>14.执行用.&#x2F;</p>
+<p>15.可以通过<code> readelf -h &lt;elf_name&gt;</code> 来查看头部信息</p>
+<p>16.su 切换到超级用户</p>
+<p>17.cd ..上一级目录</p>
+<h2 id="三、工具操作指令"><a href="#三、工具操作指令" class="headerlink" title="三、工具操作指令"></a>三、工具操作指令</h2><h3 id="1-file-指令"><a href="#1-file-指令" class="headerlink" title="1.file 指令"></a>1.file 指令</h3><figure class="highlight vim"><table><tr><td class="code"><pre><span class="line"><span class="keyword">file</span> <span class="keyword">ts</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight apache"><table><tr><td class="code"><pre><span class="line"><span class="attribute">ts</span>: ELF <span class="number">64</span>-bit LSB pie executable, x86-<span class="number">64</span>, version <span class="number">1</span> (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-<span class="number">64</span>.so.<span class="number">2</span>, </span><br><span class="line"><span class="attribute">BuildID</span>[sha1]=<span class="number">93</span>f72a0d1b001212ba5860a6a1da7e57a36e3f47, for GNU/Linux <span class="number">3</span>.<span class="number">2</span>.<span class="number">0</span>, not stripped</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-nm-指令"><a href="#2-nm-指令" class="headerlink" title="2.nm 指令"></a>2.nm 指令</h3><figure class="highlight vim"><table><tr><td class="code"><pre><span class="line"><span class="keyword">nm</span> <span class="keyword">ts</span> </span><br></pre></td></tr></table></figure>
+
+<h3 id="3-readelf-指令"><a href="#3-readelf-指令" class="headerlink" title="3.readelf 指令"></a>3.readelf 指令</h3><figure class="highlight css"><table><tr><td class="code"><pre><span class="line">readelf -<span class="selector-tag">a</span> ts</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-checksec"><a href="#4-checksec" class="headerlink" title="4.checksec"></a>4.checksec</h3><figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">checksec <span class="attribute">--file</span>=pwn1 </span><br></pre></td></tr></table></figure>
+
+<h3 id="5-hexdump-指令"><a href="#5-hexdump-指令" class="headerlink" title="5.hexdump 指令"></a>5.hexdump 指令</h3><figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">hexdump ts</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="6-strings-指令"><a href="#6-strings-指令" class="headerlink" title="6.strings 指令"></a>6.strings 指令</h3><figure class="highlight angelscript"><table><tr><td class="code"><pre><span class="line"><span class="built_in">string</span>s ts</span><br></pre></td></tr></table></figure>
+
+<h3 id="7-objdump-指令"><a href="#7-objdump-指令" class="headerlink" title="7.objdump 指令"></a>7.objdump 指令</h3><figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">objdump -d ts</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="8-ldd-指令"><a href="#8-ldd-指令" class="headerlink" title="8.ldd 指令"></a>8.ldd 指令</h3><figure class="highlight avrasm"><table><tr><td class="code"><pre><span class="line"><span class="keyword">ldd</span> ts</span><br></pre></td></tr></table></figure>
 ]]></content>
   </entry>
   <entry>
@@ -263,7 +285,63 @@
 <p>  8  7  6  5  </p>
 <p>10 11.1 8  3  </p>
 <p>78 80 85.5 65  输出：4.00 8.00 11.10 85.50 </p>
-<figure class="highlight"><table><tr><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight arduino"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> n, i, j;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;n);</span><br><span class="line">    <span class="type">double</span> matrix[n][n];</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span>(j = <span class="number">0</span>; j &lt; n; j++) &#123;</span><br><span class="line">            <span class="built_in">scanf</span>(<span class="string">&quot;%lf&quot;</span>, &amp;matrix[i][j]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="type">double</span> max = matrix[i][<span class="number">0</span>];</span><br><span class="line">        <span class="keyword">for</span>(j = <span class="number">1</span>; j &lt; n; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span>(matrix[i][j] &gt; max) &#123;</span><br><span class="line">                max = matrix[i][j];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%.2f &quot;</span>, max); </span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="实验课三（24-11-17）"><a href="#实验课三（24-11-17）" class="headerlink" title="实验课三（24.11.17）"></a>实验课三（24.11.17）</h1><ol start="3">
+<li>打开C集成开发环境，建立一个sy3-3.cpp文件，编写程序，输出如下规律字母图形（本图行数n&#x3D;6），其中行数n由键盘输入，第1行左侧无空格。</li>
+</ol>
+<p>输入：6，输出： ABCDEFEDCBA</p>
+<p>​         ABCDEDCBA</p>
+<p>​           ABCDCBA</p>
+<p>​            ABCBA</p>
+<p>​            ABA</p>
+<p>​             A</p>
+<p>​    输入：3，输出：ABCBA</p>
+<p>​          ABA</p>
+<p>​           A</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> n; </span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;n); </span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; i; j++) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot; &quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">char</span> ch = <span class="string">&#x27;A&#x27;</span>; ch &lt; <span class="string">&#x27;A&#x27;</span> + (n - i); ch++) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%c&quot;</span>, ch);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">char</span> ch = <span class="string">&#x27;A&#x27;</span> + (n - i - <span class="number">2</span>); ch &gt;= <span class="string">&#x27;A&#x27;</span>; ch--) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%c&quot;</span>, ch);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<ol start="4">
+<li>打开C集成开发环境，建立一个sy3-4.cpp文件，编写程序，计算自然常数e近似值，精度由键盘输入q值控制，输出时显示6位小数。其中计算e公式如下：</li>
+</ol>
+<p>$$<br>e≈1+1&#x2F;1!+1&#x2F;2!+1&#x2F;3!+1&#x2F;4!+⋯<br>$$</p>
+<p>例如：</p>
+<p>输入：0.001，输出：2.718254</p>
+<p>输入：0.0001，输出：2.718279</p>
+<p>输入：0.00001，输出：2.718282</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">double</span> e = <span class="number">1.0</span>; </span><br><span class="line">    <span class="type">double</span> t = <span class="number">1.0</span>; </span><br><span class="line">    <span class="type">double</span> q; </span><br><span class="line">    <span class="type">int</span> n = <span class="number">1</span>; </span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%lf&quot;</span>, &amp;q);</span><br><span class="line">    <span class="keyword">while</span> (t &gt;= q) &#123;</span><br><span class="line">        t = t / n; </span><br><span class="line">        e += t;      </span><br><span class="line">        n++;         </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%.6f\n&quot;</span>, e);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<ol start="5">
+<li>打开C集成开发环境，建立一个sy3-5.cpp文件，输入如下程序代码。编程的本意是：1~100的整数，遇到5的倍数就跳出，否则累加。</li>
+</ol>
+<p>#include &lt;stdio.h&gt;</p>
+<p>int main()</p>
+<p>{</p>
+<p>​    int i &#x3D; 1,sum &#x3D; 0;</p>
+<p>​    while (i &lt;&#x3D; 100)</p>
+<p>​    {</p>
+<p>​         if(i % 5 &#x3D;&#x3D; 0)</p>
+<p>​             continue;</p>
+<p>​         else</p>
+<p>​             sum +&#x3D; i;</p>
+<p>​         i++;</p>
+<p>​    }</p>
+<p>​    printf(“sum&#x3D;%d”,sum);</p>
+<p>​    return 0;</p>
+<p>}</p>
+<p>试分析以上程序可能存在的问题，应如何改进。</p>
+<p>程序运行无输入，输出：sum&#x3D;4000</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line">问题分析</span><br><span class="line">代码的逻辑中存在问题在于 <span class="keyword">continue</span> 语句的使用方式。</span><br><span class="line"><span class="keyword">continue</span> 语句会跳过当前循环的剩余部分，并直接开始下一次迭代。然而，在当前程序中，当 <span class="keyword">if</span>(i % <span class="number">5</span> == <span class="number">0</span>) 条件为真时，程序进入 <span class="keyword">continue</span> 分支，导致循环跳过了 i++ 的更新语句。这会形成死循环（i 始终为当前值），使程序无法跳出。</span><br><span class="line"></span><br><span class="line">问题改进</span><br><span class="line">需要确保无论是否遇到 <span class="number">5</span> 的倍数，变量 i 都能正常递增。改进的方式有以下两种：</span><br></pre></td></tr></table></figure>
+
+<h3 id="改进方式-1：在-continue-之前增加-i"><a href="#改进方式-1：在-continue-之前增加-i" class="headerlink" title="改进方式 1：在 continue 之前增加 i++"></a><strong>改进方式 1：在 <code>continue</code> 之前增加 <code>i++</code></strong></h3><p>将 <code>i++</code> 放在 <code>continue</code> 语句之前，保证在跳过当前迭代之前更新 <code>i</code> 的值：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">1</span>, sum = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (i &lt;= <span class="number">100</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (i % <span class="number">5</span> == <span class="number">0</span>) &#123;</span><br><span class="line">            i++;        </span><br><span class="line">            <span class="keyword">continue</span>;   </span><br><span class="line">        &#125;</span><br><span class="line">        sum += i;</span><br><span class="line">        i++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;sum=%d&quot;</span>, sum);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="改进方式-2：去掉-continue，调整逻辑"><a href="#改进方式-2：去掉-continue，调整逻辑" class="headerlink" title="改进方式 2：去掉 continue，调整逻辑"></a><strong>改进方式 2：去掉 <code>continue</code>，调整逻辑</strong></h3><p>可以完全去掉 <code>continue</code>，通过增加条件语句的判断来实现同样的效果：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">1</span>, sum = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (i &lt;= <span class="number">100</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (i % <span class="number">5</span> != <span class="number">0</span>) &#123; </span><br><span class="line">            sum += i;     </span><br><span class="line">        &#125;</span><br><span class="line">        i++;             </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;sum=%d&quot;</span>, sum);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 ]]></content>
   </entry>
@@ -281,5 +359,10 @@
 <p><img src="https://p.sda1.dev/19/9ac69690bc530b9566822a120b9d490c/ctfos.png"></p>
 <p><img src="https://p.sda1.dev/19/3b52bc0bd23513b9e5d3fbb14371c70e/ub.png"></p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>pwn之旅 （二）</title>
+    <url>/2024/11/16/pwn%E4%B9%8B%E6%97%85-%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
+    <content><![CDATA[<h1 id="pwn之旅（二）"><a href="#pwn之旅（二）" class="headerlink" title="pwn之旅（二）"></a>pwn之旅（二）</h1><h2 id="一、shellcode"><a href="#一、shellcode" class="headerlink" title="一、shellcode"></a>一、shellcode</h2>]]></content>
   </entry>
 </search>
