@@ -40,6 +40,12 @@
     padding-top: 2.25rem !important;
     padding-bottom: 2rem !important;
   }
+  /* Strip Tailwind's prose `max-width: 65ch` so the About bio fills
+     the full col-span-8 width and each line spans across. */
+  .resume-biography .prose,
+  .resume-biography .prose-lg {
+    max-width: none !important;
+  }
 }
 
 /* Widen Hugo Blox's default landing-page container from 80rem → 96rem.

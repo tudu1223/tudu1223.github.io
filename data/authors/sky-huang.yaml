@@ -13,12 +13,11 @@ status:
   icon: "🌱"
 role: 'Undergraduate Researcher · AI for Science'
 bio: |
-  Undergraduate researcher at Fujian Agriculture and Forestry University
-  (FAFU), working at the intersection of single-cell transcriptomics and
-  gene regulatory network (GRN) inference. I integrate multi-omics data
-  with high physical-confidence evidence to design principled algorithms
-  and to build rigorous benchmarks for GRN inference — broadly interested
-  in AI for Science.
+  Standing at the intersection of artificial intelligence and traditional
+  research, I believe AI4bio has reached a turning point. The methods I
+  want to build are not leaderboard-driven — they are pipelines that
+  wet-lab biologists actually use, with the explicit goal of cutting the
+  time and cost of traditional experiments.
 
   Methodologically, I'm drawn to settings where the data is messy and the
   assumptions are sharp. Most published GRN methods do well on toy
@@ -29,17 +28,15 @@ bio: |
   reproducible, CPU-friendly baseline that survives basic hyperparameter
   ablations — even if it does not top a leaderboard.
 
-  福建农林大学本科生，专注于单细胞转录组学与基因调控网络（GRN）推断；
-  结合多组学与高物理置信度数据，开展算法构建与精准基准评估。
+  站在人工智能与传统研究的交界处，我相信 AI4bio 已经来到一个转折点。
+  我想要打造的方法不是为了刷榜，而是真正能被湿实验生物学家用上的
+  pipeline，让传统实验的时间和成本切实降下来。
 
   方法上，我对"数据脏、假设尖"的问题天然亲近。大多数公开的 GRN 方法
   在干净基准上漂亮，在真实噪声、批次效应、稀疏覆盖下塌方。我现阶段在
   做两件事：（一）用统一的预处理流水线，把 BEELINE 系方法拉到同一尺子上
   比较；（二）写一个可复现、纯 CPU 也能跑的开源基线 — 即使它不刷榜，
   至少能扛住基本消融实验。
-
-  长期方向上，我希望做的方法能最终插进湿实验 pipeline，而不是为了刷
-  leaderboard 而存在。本科起步，节奏稳一点。
 
 affiliations:
   - name: Fujian Agriculture and Forestry University (FAFU)
