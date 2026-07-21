@@ -26,22 +26,12 @@
    Project-specific tweaks
    ========================================================================== */
 
-/* Tighten the resume-biography hero — the default py-32 was too tall
-   for a single-column no-avatar intro on first load. */
+/* Tighten the resume-biography hero — the default py-32 left too much
+   whitespace above the fold. */
 @layer base {
   .resume-biography {
     padding-top: 2.5rem !important;
     padding-bottom: 2rem !important;
-  }
-  /* When no avatar is set, hide the empty left column and let the right
-     column take the full width centred. */
-  .resume-biography .grid > .md\:col-span-4:not(:has(.avatar-wrapper)),
-  .resume-biography .grid > .md\:col-span-4:not(:has(img)) {
-    display: none !important;
-  }
-  .resume-biography .grid > .md\:col-span-8,
-  .resume-biography .grid > .md\:col-span-9 {
-    grid-column: span 12 / span 12 !important;
   }
 }
 
