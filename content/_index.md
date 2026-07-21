@@ -76,25 +76,6 @@ sections:
       columns: '1'
 
   # ===========================================================
-  # 关键工具与背景技能（新增区块）
-  # ===========================================================
-  - block: markdown
-    content:
-      title: 'Stack & background'
-      subtitle: 'Daily drivers + research-adjacent skills'
-      text: |-
-        | 编程 / Programming |  Python, PyTorch, scikit-learn, NumPy, pandas,
-        |  |  单细胞流水线（Scanpy · scvi-tools）, 基本 C++ |
-        | 数据与基准 / Data & Bench |  BEELINE 生态、single-cell 公共数据
-        |  | （如 NeurIPS competitions）、Multi-omics 整合（MOFA, Seurat v5） |
-        | 作图 / Visualization |  matplotlib、seaborn、MATLAB（常用学术风配色
-        |  | 见 *Posts* 中的 *MATLAB 配色与常用绘图*） |
-        | 工具 / Tools |  Zotero + DBLP、Overleaf、Hugo
-        |  | （本博客）、Linux CLI、basic LaTeX |
-    design:
-      columns: '2'
-
-  # ===========================================================
   # Recent Posts（5 篇笔记）
   # ===========================================================
   - block: collection

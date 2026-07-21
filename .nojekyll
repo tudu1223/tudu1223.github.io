@@ -1,0 +1,4 @@
+# Prevent GitHub Pages from running Jekyll on this repo.
+# Without this marker file, a README.md at the repo root gets auto-rendered
+# by Jekyll and served at / as a (wrong) homepage — even when the Hugo
+# build is uploaded via GitHub Actions. Source: GitHub Pages docs.
