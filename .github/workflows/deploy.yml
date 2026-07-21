@@ -29,15 +29,16 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.23'
-          cache: true
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
+          # Pin to an LTS that powers Hugo Blox's Tailwind v4 build.
+          node-version: '20.x'
+          # Skip the built-in pnpm cache (we let pnpm/action-setup handle caching).
+          cache: 'npm'
 
-      - name: Setup pnpm
+      - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
@@ -48,8 +49,8 @@ jobs:
           hugo-version: '0.162.0'
           extended: true
 
-      - name: Install Node deps
-        run: pnpm install
+      - name: Install Node dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Build with Hugo
         env:
