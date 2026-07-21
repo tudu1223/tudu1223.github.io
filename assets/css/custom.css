@@ -1,0 +1,32 @@
+/* ------------------------------------------------------------------ */
+/* Sky Huang · site-level visual tweaks                              */
+/* ------------------------------------------------------------------ */
+
+/* Tighten the resume-biography hero — the default py-32 was too tall
+   for a single-column no-avatar intro on first load. */
+.resume-biography {
+  padding-top: 2.5rem !important;
+  padding-bottom: 2.5rem !important;
+}
+
+/* When the avatar isn't set, the 4-col left column is empty. Shift the
+   right column up to fill the visual gap. */
+.resume-biography .grid > .md\:col-span-4:not(:has(.avatar-wrapper)) {
+  display: none !important;
+}
+.resume-biography .grid > .md\:col-span-8 {
+  grid-column: span 12 / span 12 !important;
+  text-align: center !important;
+}
+
+/* Reduce default section spacing — the academic theme uses 6rem per
+   section which on a single-screen page feels airy. */
+:where(.hb-section, [class*="py-"]) section {
+  scroll-margin-top: 4rem;
+}
+
+/* Make the navbar sticky and add a subtle shadow once scrolled. */
+body > header,
+nav[class*="navbar"] {
+  backdrop-filter: blur(8px);
+}

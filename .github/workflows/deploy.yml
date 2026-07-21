@@ -30,18 +30,14 @@ jobs:
         with:
           go-version: '1.23'
 
-      - name: Setup Node.js
+      - name: Setup Node.js (LTS)
         uses: actions/setup-node@v4
         with:
-          # Pin to an LTS that powers Hugo Blox's Tailwind v4 build.
-          node-version: '20.x'
-          # Skip the built-in pnpm cache (we let pnpm/action-setup handle caching).
-          cache: 'npm'
+          node-version: 'lts/*'
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
+      - name: Install pnpm via npm
+        # Use plain npm to install pnpm — avoids the `pnpm/action-setup` PATH issue.
+        run: npm install -g pnpm@10
 
       - name: Install Hugo (Extended)
         uses: peaceiris/actions-hugo@v3

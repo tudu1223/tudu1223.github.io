@@ -1,0 +1,55 @@
+/* ==========================================================================
+   Sky Huang · main CSS entry point (overrides Hugo Blox's default)
+   ==========================================================================
+   We import Hugo Blox's full stack first, then layer our site-specific tweaks
+   on top using `@layer base` and `@layer utilities`.
+   ========================================================================== */
+
+/* Tailwind CSS v4 base */
+@import "tailwindcss";
+
+/* Pull in the full Hugo Blox stack */
+@import "config/tailwind.css";
+@import "config/theme.css";
+@import "framework/base.css";
+@import "color-utilities.css";
+@import "layout-utilities.css";
+@import "framework/components.css";
+@import "components/all.css";
+@import "views/all.css";
+@import "chroma.css";
+@import "hb-search.css";
+@import "animations.css";
+@import "config/safelist.css";
+
+/* ==========================================================================
+   Project-specific tweaks
+   ========================================================================== */
+
+/* Tighten the resume-biography hero — the default py-32 was too tall
+   for a single-column no-avatar intro on first load. */
+@layer base {
+  .resume-biography {
+    padding-top: 2.5rem !important;
+    padding-bottom: 2rem !important;
+  }
+  /* When no avatar is set, hide the empty left column and let the right
+     column take the full width centred. */
+  .resume-biography .grid > .md\:col-span-4:not(:has(.avatar-wrapper)),
+  .resume-biography .grid > .md\:col-span-4:not(:has(img)) {
+    display: none !important;
+  }
+  .resume-biography .grid > .md\:col-span-8,
+  .resume-biography .grid > .md\:col-span-9 {
+    grid-column: span 12 / span 12 !important;
+  }
+}
+
+/* Slightly tighter section spacing — `6rem` per section is on the airy
+   side for a single-landing-page. */
+@layer utilities {
+  .hb-section-spacing {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}
