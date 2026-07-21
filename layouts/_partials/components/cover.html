@@ -1,0 +1,21 @@
+{{/*
+  Local override of Hugo Blox's cover partial.
+
+  Why this file exists:
+  - The original `layouts/_partials/components/cover.html` from
+    Hugo Blox renders a gradient placeholder with an icon when a
+    page has frontmatter like `cover:` or `image:`, even if the
+    user didn't supply an actual cover file.
+  - The Sky Huang site has no cover art per post and renders
+    nothing wrong by default — but to make this *robust* (so that
+    adding `cover:` to a frontmatter by accident doesn't suddenly
+    drop a giant gradient image onto the post page) we override
+    the partial with an empty render.
+
+  Hugo's lookup rules: a partial defined in the project at the
+  same path overrides the module's partial. So this file replaces
+  the module-supplied cover.html.
+
+  To re-enable covers in the future, delete this file (the
+  module's cover.html will be picked up again).
+*/}}
