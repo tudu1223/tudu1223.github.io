@@ -1,0 +1,23 @@
+# Languages
+#   Site is primary Chinese (default). English scaffolding is wired up
+#   so English content can be added later under `content/en/`.
+
+# Default language (Chinese)
+zh-cn:
+  locale: zh-CN
+  contentDir: content
+  languageName: 简体中文
+  weight: 1
+  title: 'Sky Huang · 研究与笔记'
+  params:
+    description: 'Sky Huang — 福建农林大学本科生，从事 AI for Science 研究：单细胞转录组学与基因调控网络（GRN）推断。'
+
+# Secondary language scaffold (English) — uncomment and create `content/en/` once content is ready
+# en:
+#   locale: en-us
+#   contentDir: content/en
+#   languageName: English
+#   weight: 2
+#   title: 'Sky Huang · Research & Notes'
+#   params:
+#     description: 'Sky Huang — Undergraduate researcher at Fujian Agriculture and Forestry University. AI for Science, single-cell transcriptomics and gene regulatory network (GRN) inference.'

@@ -1,0 +1,83 @@
+schema: hugoblox/author/v1
+slug: sky-huang
+is_owner: true
+name:
+  display: Sky Huang
+  given: Sikai
+  family: Huang
+  alternate: 黄思凯
+  pronunciation: 'Huáng Sīkǎi'
+  pronouns: he/him
+postnominals: []
+status:
+  icon: "🌱"
+role: 'Undergraduate Researcher · AI for Science'
+bio: |
+  Undergraduate researcher at Fujian Agriculture and Forestry University (FAFU),
+  working at the intersection of single-cell transcriptomics and gene regulatory
+  network (GRN) inference. I integrate multi-omics data with high
+  physical-confidence evidence to design principled algorithms and to build
+  rigorous benchmarks for GRN inference — broadly interested in AI for Science.
+
+  福建农林大学本科生，专注于单细胞转录组学与基因调控网络（GRN）推断；
+  结合多组学与高物理置信度数据，开展算法构建与精准基准评估。
+
+affiliations:
+  - name: Fujian Agriculture and Forestry University (FAFU)
+    url: https://www.fafu.edu.cn/
+
+links:
+  - icon: at-symbol
+    url: mailto:sk_hwong@outlook.com
+    label: E-mail
+  - icon: brands/github
+    url: https://github.com/tudu1223
+    label: GitHub
+  - icon: academicons/orcid
+    url: https://orcid.org/0009-0003-2335-563X
+    label: ORCID
+
+interests:
+  - AI for Science (AI4Science)
+  - Single-cell transcriptomics
+  - Gene Regulatory Network (GRN) inference
+  - Multi-omics integration
+  - Algorithm benchmarking
+
+education: []
+
+experience:
+  - role: Undergraduate Researcher (AI for Science)
+    org: Independent · FAFU
+    start: 2024-09-01
+    summary: |
+      Self-directed research on GRN inference and benchmarking under the
+      AI4Science umbrella; building reproducible pipelines and notes.
+
+skills:
+  - name: Research
+    items:
+      - label: Single-cell & GRN analysis
+        level: 4
+      - label: Benchmarking & evaluation
+        level: 4
+      - label: Scientific writing
+        level: 3
+  - name: Engineering
+    items:
+      - label: Python / PyTorch
+        level: 4
+      - label: Data visualization (MATLAB/Matplotlib)
+        level: 4
+      - label: Linux tooling
+        level: 3
+
+languages:
+  - name: Chinese
+    level: 5
+    label: Native
+  - name: English
+    level: 4
+    label: Professional working
+
+awards: []

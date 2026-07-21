@@ -1,0 +1,25 @@
+# Hugo
+public/
+resources/
+.hugo_build.lock
+.hugo_cache/
+hugo_stats.json
+
+# Node / pnpm
+node_modules/
+.pnpm-store/
+
+# Archive of legacy content (kept locally, NOT pushed)
+_legacy-hexo/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Build artifacts
+*.log
+.cache/

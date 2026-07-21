@@ -1,0 +1,18 @@
+# Navigation Links
+#   To link a homepage widget, specify the URL as a hash `#` followed by the filename of the
+  #     desired widget in your `content/home/` folder.
+  #   The weight parameter defines the order that the links will appear in.
+
+main:
+  - name: 主页 / Bio
+    url: /
+    weight: 10
+  - name: 研究 / Publications
+    url: /#papers
+    weight: 20
+  - name: 笔记 / Posts
+    url: /#news
+    weight: 30
+  - name: 出版物 / Publications Archive
+    url: publications/
+    weight: 40
