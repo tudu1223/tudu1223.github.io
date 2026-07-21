@@ -22,7 +22,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: recursive
           fetch-depth: 0
 
       - name: Setup Go (for Hugo module downloads)
@@ -33,11 +32,7 @@ jobs:
       - name: Setup Node.js (LTS)
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
-
-      - name: Install pnpm via npm
-        # Use plain npm to install pnpm — avoids the `pnpm/action-setup` PATH issue.
-        run: npm install -g pnpm@10
+          node-version: '20'
 
       - name: Install Hugo (Extended)
         uses: peaceiris/actions-hugo@v3
@@ -45,18 +40,24 @@ jobs:
           hugo-version: '0.162.0'
           extended: true
 
-      - name: Install Node dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Install npm dependencies (Tailwind v4 / Pagefind)
+        # Hugo Blox processes Tailwind at build time via @tailwindcss/cli;
+        # running `npm install` keeps the toolchain compatible with whichever
+        # runner Node version is currently in use.
+        run: npm install
 
       - name: Build with Hugo
         env:
           HUGO_ENVIRONMENT: production
           HUGO_ENABLEGITINFO: true
+        # Note: do NOT run `hugo mod tidy` here. Our go.mod/go.sum are committed
+        # and the runner picks them up via `peaceiris/actions-hugo`. Tidy would
+        # rewrite versions and risk pulling a newer Hugo Blox release that is
+        # incompatible with the local theme assets.
         run: |
-          hugo mod tidy
-          hugo --gc --minify
+          hugo --gc --minify --printPathWarnings
 
-      - name: Upload artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./public
