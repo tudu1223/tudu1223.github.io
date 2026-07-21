@@ -7,30 +7,26 @@ type: landing
 
 sections:
   # ===========================================================
-  # 顶部 hero — 单列紧凑型,无 avatar 占位
+  # 顶部 hero — 双列布局
+  #   左列(占 1/3): 姓名 · 角色 · 单位 · 社交圈
+  #   右列(占 2/3): About + 中英简介
   # ===========================================================
-  - block: markdown
+  - block: resume-biography-3
     content:
-      title: 'Sky Huang · 黄思凯'
-      subtitle: 'Undergraduate Researcher · AI for Science · FAFU'
-      text: |-
-        **Pronouns ·** *he/him ·*  Huáng Sīkǎi
-
-        研究单细胞转录组学与基因调控网络（GRN）推断。结合多组学与高物理置信度
-        数据，做算法构建与精准基准评估，让结果既在生物学上可解释、又能在计算上
-        可复现。AI for Science 取向，本科起步阶段。
-
-        研究方向 / **Research interests** — AI for Science · Single-cell
-        transcriptomics · GRN inference · Multi-omics integration · Algorithm benchmarking.
-
-        联系 / **Reach me** —
-        [sk_hwong@outlook.com](mailto:sk_hwong@outlook.com) ·
-        [GitHub](https://github.com/tudu1223) ·
-        [ORCID](https://orcid.org/0009-0003-2335-563X) ·
-        公众号「**江水的云组会**」·
-        福建省福州市 福建农林大学
+      username: sky-huang
+      headings:
+        about: 'About'
+        education: 'Education'
+        interests: 'Research interests'
     design:
-      columns: '1'
+      background:
+        gradient_mesh:
+          enable: false
+      name:
+        size: lg
+      avatar:
+        size: small
+        shape: circle
 
   # ===========================================================
   # 当前在做（高密度三段）

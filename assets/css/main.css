@@ -26,17 +26,32 @@
    Project-specific tweaks
    ========================================================================== */
 
-/* Tighten the resume-biography hero — the default py-32 left too much
-   whitespace above the fold. */
+/* Tighten the resume-biography hero vertically and stretch the
+   container wider so there is less empty side-padding on big screens
+   (default is `max-w-7xl mx-auto` ~80rem, we lift it to 96rem). */
 @layer base {
   .resume-biography {
-    padding-top: 2.5rem !important;
+    padding-top: 2.25rem !important;
     padding-bottom: 2rem !important;
+  }
+  .resume-biography > .max-w-7xl {
+    max-width: 96rem !important;        /* was 80rem */
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
   }
 }
 
-/* Slightly tighter section spacing — `6rem` per section is on the airy
-   side for a single-landing-page. */
+/* Same wider container for every other block — Hugo Blox caps them
+   at max-w-7xl; landing pages read better when stretched. */
+@layer base {
+  [class*="max-w-7xl"][class*="mx-auto"] {
+    max-width: 96rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+/* Tighter section spacing across the page. */
 @layer utilities {
   .hb-section-spacing {
     padding-top: 3rem;
