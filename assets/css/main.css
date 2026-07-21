@@ -1,7 +1,7 @@
 /* ==========================================================================
    Sky Huang · main CSS entry point (overrides Hugo Blox's default)
    ==========================================================================
-   We import Hugo Blox's full stack first, then layer our site-specific tweaks
+   We import Hugo Blox's full stack first, then layer site-specific tweaks
    on top using `@layer base` and `@layer utilities`.
    ========================================================================== */
 
@@ -24,34 +24,36 @@
 
 /* ==========================================================================
    Project-specific tweaks
+   ==========================================================================
+   v3 — Compact hero + wider content container.
+   The `max-w-7xl` selector below targets the inner container of every
+   landing-page block (Hugo Blox emits `<div class="max-w-7xl mx-auto">`
+   without escapes, so an attribute selector is the safest cross-version
+   match). Bumping the max-width to 96rem reduces the visible side gutters
+   on wide screens while the vertical-padding override keeps the hero
+   from breathing too much above the fold.
    ========================================================================== */
 
-/* Tighten the resume-biography hero vertically and stretch the
-   container wider so there is less empty side-padding on big screens
-   (default is `max-w-7xl mx-auto` ~80rem, we lift it to 96rem). */
 @layer base {
+  /* Tighten the resume-biography hero block. */
   .resume-biography {
     padding-top: 2.25rem !important;
     padding-bottom: 2rem !important;
   }
-  .resume-biography > .max-w-7xl {
-    max-width: 96rem !important;        /* was 80rem */
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
-  }
 }
 
-/* Same wider container for every other block — Hugo Blox caps them
-   at max-w-7xl; landing pages read better when stretched. */
+/* Widen Hugo Blox's default landing-page container from 80rem → 96rem.
+   We use an attribute selector because Tailwind v4 sometimes serialises
+   `max-w-7xl` and `mx-auto` into a single class with no separator. */
 @layer base {
-  [class*="max-w-7xl"][class*="mx-auto"] {
+  [class~="max-w-7xl"] {
     max-width: 96rem !important;
     padding-left: 1rem !important;
     padding-right: 1rem !important;
   }
 }
 
-/* Tighter section spacing across the page. */
+/* Tighter section spacing across the page (utility kept for future use). */
 @layer utilities {
   .hb-section-spacing {
     padding-top: 3rem;
