@@ -5,6 +5,12 @@ resources/
 .hugo_cache/
 hugo_stats.json
 
+# Local debug / inspection artifacts (kept out of git)
+tmp_*.html
+tmp_*.css
+tmp_*.py
+inspect_*.py
+
 # Node / pnpm
 node_modules/
 .pnpm-store/
